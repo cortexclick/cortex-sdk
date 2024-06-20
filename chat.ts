@@ -40,18 +40,18 @@ export interface RespondChatOptsSync extends RespondChatOptsBase {
 }
 
 export interface ChatListItem {
-    title: string;
-    id: string;
-    messageCount: number;
-    Chat(): Promise<Chat>;
+  title: string;
+  id: string;
+  messageCount: number;
+  Chat(): Promise<Chat>;
 }
 export interface ChatListResult {
-    chats: ChatListItem[];
-    nextPage: () => Promise<ChatListResult>;
+  chats: ChatListItem[];
+  nextPage: () => Promise<ChatListResult>;
 }
 export interface ChatListPaginationOpts {
-    cursor?: string;
-    pageSize?: number;
+  cursor?: string;
+  pageSize?: number;
 }
 
 export type Message = {
@@ -149,33 +149,43 @@ export class Chat {
     const body = await res.json();
     return new Chat(client, id, body.title, body.messages);
   }
-  
-  static async list(client: CortexApiClient, paginationOpts?: ChatListPaginationOpts): Promise<ChatListResult> {
+
+  static async list(
+    client: CortexApiClient,
+    paginationOpts?: ChatListPaginationOpts,
+  ): Promise<ChatListResult> {
     const chats: ChatListItem[] = [];
 
     const query = new URLSearchParams();
     if (paginationOpts?.cursor) {
-        query.set("cursor", paginationOpts.cursor);
+      query.set("cursor", paginationOpts.cursor);
     }
     query.set("pageSize", (paginationOpts?.pageSize || 50).toString());
     const res = await client.GET(`/chats?${query.toString()}`);
     if (res.status !== 200) {
-        throw new Error(`Failed to list chats: ${res.statusText}`);
+      throw new Error(`Failed to list chats: ${res.statusText}`);
     }
     const body = await res.json();
     for (const chat of body.chats) {
-        chats.push({
-            title: chat.title,
-            id: chat.chatId,
-            messageCount: chat.messageCount,
-            Chat: () => { return Chat.get(client, chat.chatId) }
-        })
+      chats.push({
+        title: chat.title,
+        id: chat.chatId,
+        messageCount: chat.messageCount,
+        Chat: () => {
+          return Chat.get(client, chat.chatId);
+        },
+      });
     }
 
     const cursor = body.cursor;
     const pageSize = paginationOpts?.pageSize;
-    return { chats, nextPage: async () => { return Chat.list(client, { cursor, pageSize }) } };
-}
+    return {
+      chats,
+      nextPage: async () => {
+        return Chat.list(client, { cursor, pageSize });
+      },
+    };
+  }
 
   async respond(opts: RespondChatOptsSync): Promise<string>;
   async respond(opts: RespondChatOptsStreaming): Promise<StreamingChatResult>;
