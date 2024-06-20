@@ -45,6 +45,10 @@ export interface ClientListContentPaginationOpts {
     pageSize?: number;
     cursor?: string;
 }
+export interface ClientListChatPaginationOpts {
+    pageSize?: number;
+    cursor?: string;
+}
 
 const apiUrl = process.env.CORTEX_API_URL || "https://api.cortexclick.com";
 
@@ -114,7 +118,9 @@ export class CortexClient {
         return Content.list(this.apiClient, paginationOptions);
     }
 
-    async listChats() { }
+    async listChats(paginationOptions?: ClientListChatPaginationOpts) {
+        return Chat.list(this.apiClient, paginationOptions);
+    }
 
     async getCortex(name: string): Promise<Cortex> {
         return Cortex.get(this.apiClient, name)
