@@ -1,5 +1,9 @@
 type Method = "POST" | "GET" | "PUT" | "DELETE";
 
+// body can be any object
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
+
 export class CortexApiClient {
     constructor(private org: string, private apiUrl: string, private accessToken: string) { }
 

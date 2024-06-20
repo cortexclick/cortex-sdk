@@ -1,6 +1,9 @@
 import { Catalog } from '../catalog.js';
 import { JSONDocument } from "../document.js";
 
+// intentionally operates on any type
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 export type JSONIndexerOpts = {
     getId?: (document: any) => string;
     getUrl?: (document: any) => string | undefined;
@@ -14,7 +17,7 @@ export class JSONIndexer {
     private readonly getUrl: (document: any) => string | undefined;
     private batch: JSONDocument[] = [];
 
-    constructor(private catalog: Catalog, private documents: any[], private opts?: JSONIndexerOpts) {
+    constructor(private catalog: Catalog, private documents: any[], opts?: JSONIndexerOpts) {
         this.getId = opts?.getId ?? JSONIndexer.defaultGetId;
         this.getUrl = opts?.getUrl ?? JSONIndexer.defaultGetUrl;
         this.getImageUrl = opts?.getImageUrl ?? JSONIndexer.defaultGetImageUrl; 
@@ -38,7 +41,7 @@ export class JSONIndexer {
     }
 
     private static findFirstMatchingProperty(document: any, ...propertyNames: string[]) : string | undefined {
-        for (let prop of propertyNames) {
+        for (const prop of propertyNames) {
             if (prop in document) {
                 return document[prop];
             }
@@ -53,7 +56,7 @@ export class JSONIndexer {
 
     private async indexItems(): Promise<void> {
 
-        for (let document of this.documents) {
+        for (const document of this.documents) {
             if (this.batch.length > this.parallelism) {
                 await this.catalog.upsertDocuments(this.batch);
                 this.batch = [];

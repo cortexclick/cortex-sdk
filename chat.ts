@@ -44,8 +44,6 @@ export type Message = {
     message: string;
 };
 
-export type ListChatsResult = {};
-
 export class Chat {
     private constructor(private apiClient: CortexApiClient, readonly id: string, readonly title: string, readonly messages: Message[]) {
     }
@@ -114,10 +112,6 @@ export class Chat {
         }
         const body = await res.json();
         return new Chat(client, id, body.title, body.messages);
-    }
-
-    static async list(): Promise<ListChatsResult[]> {
-        return [];
     }
 
     async respond(opts: RespondChatOptsSync): Promise<string>;

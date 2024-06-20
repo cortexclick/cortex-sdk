@@ -1,4 +1,4 @@
-import { expect, test, beforeEach, afterEach } from 'vitest'
+import { expect, test, afterEach } from 'vitest'
 import { CortexClient } from "./index";
 import { Catalog, CatalogConfig } from "./catalog";
 

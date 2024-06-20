@@ -2,6 +2,10 @@ import * as fs from 'node:fs';
 import { Catalog } from '../catalog.js';
 import { JSONIndexer } from './json-indexer.js';
 
+// intentionally operates on any type
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
+
 export type TSVIndexerOpts = {
     getId?: (item: any) => string;
     getUrl?: (item: any) => string;
@@ -36,7 +40,7 @@ export class TSVIndexer {
         const header = rows[0].split("\t");
         for(let i = 1; i < rows.length; i++) {
             const row = rows[i].split("\t");
-            let document: { [key: string]: string } = {};
+            const document: { [key: string]: string } = {};
             for(let j = 0; j < header.length; j++) {
                 if(this.fieldMapping) {
                     if(this.fieldMapping[header[j]]) {

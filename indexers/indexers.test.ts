@@ -1,7 +1,7 @@
 import { expect, test, beforeEach, afterEach } from 'vitest'
 import { CortexClient } from "../index";
 import { Catalog, CatalogConfig } from "../catalog";
-import { FileDocument, JSONDocument, TextDocument } from '../document';
+import { JSONDocument } from '../document';
 
 const client = new CortexClient({
   accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
@@ -17,7 +17,7 @@ beforeEach(async () => {
     instructions: ["a", "b"],
   };
   
-  let catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
   catalog = await client.configureCatalog(catalogName, config);
 });
 

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { CortexClient, TextDocument } from "./index";
-import { Catalog, CatalogConfig } from "./catalog";
+import { CatalogConfig } from "./catalog";
 import { Readable } from "stream";
 
 const client = new CortexClient({
@@ -27,7 +27,7 @@ test('e2e catalog, cortex, and sync chat', { timeout: 60000 }, async () => {
   };
 
   // create
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const documents: TextDocument[] = [
     {
@@ -64,10 +64,10 @@ test('e2e catalog, cortex, and sync chat', { timeout: 60000 }, async () => {
 
   // get chat
   const getChatRes = await client.getChat(chat.id);
-  expect(chat.messages.length).toBe(2);
-  expect(chat.title).toBe(chatInput)
+  expect(getChatRes.messages.length).toBe(2);
+  expect(getChatRes.title).toBe(chatInput)
 
-  const response = await chat.respond({ message: "what about customer verticals" });
+  await chat.respond({ message: "what about customer verticals" });
   expect(chat.messages.length).toBe(4);
 
 
@@ -95,7 +95,7 @@ test('streaming chat', { timeout: 60000 }, async () => {
   };
 
   // create
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const documents: TextDocument[] = [
     {
