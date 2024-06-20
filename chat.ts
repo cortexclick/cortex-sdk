@@ -39,6 +39,21 @@ export interface RespondChatOptsSync extends RespondChatOptsBase {
     stream?: false
 }
 
+export interface ChatListItem {
+    title: string;
+    id: string;
+    messageCount: number;
+    Chat(): Promise<Chat>;
+}
+export interface ChatListResult {
+    chats: ChatListItem[];
+    nextPage: () => Promise<ChatListResult>;
+}
+export interface ChatListPaginationOpts {
+    cursor?: string;
+    pageSize?: number;
+}
+
 export type Message = {
     role: "user" | "cortex";
     message: string;
@@ -56,6 +71,33 @@ export class Chat {
         } else {
             return this.createContentStreaming(opts);
         }
+    }
+
+    static async list(client: CortexApiClient, paginationOpts?: ChatListPaginationOpts): Promise<ChatListResult> {
+        const chats: ChatListItem[] = [];
+
+        const query = new URLSearchParams();
+        if (paginationOpts?.cursor) {
+            query.set("cursor", paginationOpts.cursor);
+        }
+        query.set("pageSize", (paginationOpts?.pageSize || 50).toString());
+        const res = await client.GET(`/chats?${query.toString()}`);
+        if (res.status !== 200) {
+            throw new Error(`Failed to list chats: ${res.statusText}`);
+        }
+        const body = await res.json();
+        for (const chat of body.chats) {
+            chats.push({
+                title: chat.title,
+                id: chat.chatId,
+                messageCount: chat.messageCount,
+                Chat: () => { return Chat.get(client, chat.chatId) }
+            })
+        }
+
+        const cursor = body.cursor;
+        const pageSize = paginationOpts?.pageSize;
+        return { chats, nextPage: async () => { return Chat.list(client, { cursor, pageSize }) } };
     }
 
     private static async createContentSync(opts: CreateChatOptsSync): Promise<Chat> {
@@ -87,7 +129,7 @@ export class Chat {
         const readableStream = new Readable({
             read() { }
         });
-    
+
         const chatPromise = processStream(reader, decoder, readableStream, opts.statusStream).then(content => {
             const messages: Message[] = [
                 {
@@ -102,8 +144,8 @@ export class Chat {
             return new Chat(client, id, title, messages);
         });
 
-        return { responseStream: readableStream, chat: chatPromise};
-     }
+        return { responseStream: readableStream, chat: chatPromise };
+    }
 
     static async get(client: CortexApiClient, id: string): Promise<Chat> {
         const res = await client.GET(`/chats/${id}`);
@@ -117,7 +159,7 @@ export class Chat {
     async respond(opts: RespondChatOptsSync): Promise<string>;
     async respond(opts: RespondChatOptsStreaming): Promise<StreamingChatResult>;
     async respond(opts: RespondChatOptsSync | RespondChatOptsStreaming): Promise<string | StreamingChatResult> {
-        if(isRespondChatOptsSync(opts)) {
+        if (isRespondChatOptsSync(opts)) {
             return this.respondChatSync(opts);
         } else {
             return this.respondChatStreaming(opts);
@@ -150,7 +192,7 @@ export class Chat {
         const readableStream = new Readable({
             read() { }
         });
-    
+
         const chatPromise = processStream(reader, decoder, readableStream, opts.statusStream).then(content => {
             this.messages.push(
                 {
@@ -164,7 +206,7 @@ export class Chat {
             return this;
         });
 
-        return { responseStream: readableStream, chat: chatPromise};
+        return { responseStream: readableStream, chat: chatPromise };
     }
 
 }

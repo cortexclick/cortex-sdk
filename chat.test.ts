@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'vitest';
 import { CortexClient, TextDocument } from "./index";
 import { CatalogConfig } from "./catalog";
 import { Readable } from "stream";
@@ -61,18 +61,22 @@ test('e2e catalog, cortex, and sync chat', { timeout: 60000 }, async () => {
   const chat = await cortex.chat({ message: chatInput });
   expect(chat.messages[1].message.length).toBeGreaterThan(0);
 
-
   // get chat
   const getChatRes = await client.getChat(chat.id);
   expect(getChatRes.messages.length).toBe(2);
   expect(getChatRes.title).toBe(chatInput)
 
+  // respond to chat
   await chat.respond({ message: "what about customer verticals" });
   expect(chat.messages.length).toBe(4);
 
+  // list chats
+  const chatList = await client.listChats({ pageSize: 1 });
+  expect(chatList.chats.length).toBe(1);
 
-  // respond to chat
-
+  const nextPage = await chatList.nextPage();
+  expect(nextPage.chats.length).toBe(1);
+  expect(nextPage.chats[0].id).not.toBe(chat.id);
 
   // delete 
   await catalog.delete();
@@ -141,7 +145,7 @@ test('streaming chat', { timeout: 60000 }, async () => {
   statusStream.on('data', (data) => {
     const message = JSON.parse(data);
     expect(message.messageType).toBe("status");
-    switch(message.step) {
+    switch (message.step) {
       case "chat":
         sawChat = true;
         break;
@@ -152,7 +156,7 @@ test('streaming chat', { timeout: 60000 }, async () => {
 
   const chatResult = await chat;
 
-  expect(fullMessage).toBe(chatResult.messages[chatResult.messages.length -1 ].message);
+  expect(fullMessage).toBe(chatResult.messages[chatResult.messages.length - 1].message);
   expect(chatResult.messages.length).toBe(2);
   expect(sawChat).toBe(true);
 
@@ -160,14 +164,14 @@ test('streaming chat', { timeout: 60000 }, async () => {
   const respondResult = await chatResult.respond({ message: "what about customer verticals", stream: true, statusStream });
 
   const respondStream = respondResult.responseStream;
-  
+
   let fullResponse = ""
   respondStream.on('data', (data) => {
     fullResponse += data.toString();
   });
 
   const response = await respondResult.chat;
-  expect(fullResponse).toBe(response.messages[response.messages.length -1 ].message);
+  expect(fullResponse).toBe(response.messages[response.messages.length - 1].message);
   expect(response.messages.length).toBe(4);
 
   // delete 
