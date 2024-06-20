@@ -45,7 +45,7 @@ export class DirectoryIndexer {
     public async index() {
         const sitePathList = this.urlBase ? [this.urlBase] : [];
         await this.processDirectory([this.rootDir], sitePathList);
-        if(this.files.length) {
+        if (this.files.length) {
             await this.catalog.upsertDocuments(this.files);
             this.files = [];
         }
@@ -87,15 +87,15 @@ export class DirectoryIndexer {
         }
     }
 
-    private getUrl(docPathList: string[], sitePathList: string[]): string | undefined {
+    private getUrl(_docPathList: string[], _sitePathList: string[]): string | undefined {
         return undefined;
     }
 
-    private getId(docPathList: string[], sitePathList: string[]): string {
+    private getId(_docPathList: string[], sitePathList: string[]): string {
         return sitePathList.join("/");
     }
 
-    private getImageUrl(docPathList: string[], sitePathList: string[]): string | undefined {
+    private getImageUrl(_docPathList: string[], _sitePathList: string[]): string | undefined {
         return undefined
     }
 

@@ -18,13 +18,13 @@ export interface ClientCreateContentOptsBase {
     prompt: string;
     stream?: boolean;
     statusStream?: Readable;
-};
+}
 export interface ClientCreateContentOptsSync extends ClientCreateContentOptsBase {
     stream?: false;
-};
+}
 export interface ClientCreateContentOptsStreaming extends ClientCreateContentOptsBase {
     stream?: true;
-};
+}
 
 export interface ClientCreateChatOptsBase {
     message: string;
