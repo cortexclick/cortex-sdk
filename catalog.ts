@@ -145,8 +145,8 @@ export class Catalog {
           hasFile = true;
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           throw new Error(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             `unsupported content type: ${(doc as any).contentType}`,
           );
       }
@@ -275,8 +275,8 @@ const mapBatch = async (batch: DocumentBatch) => {
         });
         break;
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         throw new Error(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           `unsupported content type: ${(doc as any).contentType}`,
         );
     }

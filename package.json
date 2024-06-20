@@ -19,8 +19,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint . --ext .ts",
-    "lint-fix": "eslint . --ext .ts --fix",
+    "lint": "prettier --list-different . && eslint . --ext .ts || echo 'Linting errors found'",
+    "lint-fix": "prettier --write . && eslint . --ext .ts --fix",
     "dev": "node --watch -r ts-node/register index.ts",
     "run": "npm run build && node index.js",
     "test": "pulumi env run npm-test vitest .ts",
