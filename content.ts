@@ -52,14 +52,18 @@ export type EditContentOpts = {
     content?: string;
 }
 
-export type ContentListResult = {
+export type ContentListItem = {
     title: string;
     latestVersion: number;
     id: string;
     Content(): Promise<Content>;
 }
 
-export type ContentListRequestResult = { nextPage: () => Promise<ContentListRequestResult>, contents: ContentListResult[] };
+export type ContentListResult = { nextPage: () => Promise<ContentListResult>, content: ContentListItem[] };
+export type ContentListPaginationOptions = {
+    cursor?: string;
+    pageSize?: number;
+}
 
 export class Content {
     get id() {
@@ -228,8 +232,8 @@ export class Content {
         return this;
     }
 
-    static async list(client: CortexApiClient, paginationOpts?: { cursor?: string, pageSize?: number }): Promise<ContentListRequestResult> {
-        const contents: ContentListResult[] = [];
+    static async list(client: CortexApiClient, paginationOpts?: ContentListPaginationOptions): Promise<ContentListResult> {
+        const content: ContentListItem[] = [];
 
         const query = new URLSearchParams();
         if (paginationOpts?.cursor) {
@@ -241,8 +245,8 @@ export class Content {
             throw new Error(`Failed to list content: ${res.statusText}`);
         }
         const body = await res.json();
-        for (let content of body.contents) {
-            contents.push({
+        for (let content of body.content) {
+            content.push({
                 title: content.title,
                 latestVersion: content.latestVersion,
                 id: content.contentId,
@@ -252,7 +256,7 @@ export class Content {
 
         const cursor = body.cursor;
         const pageSize = paginationOpts?.pageSize;
-        return { contents, nextPage: async () => { return Content.list(client, { cursor, pageSize }) } };
+        return { content, nextPage: async () => { return Content.list(client, { cursor, pageSize }) } };
     }
 }
 
