@@ -19,7 +19,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "lint": "prettier --list-different . && eslint . --ext .ts || echo 'Linting errors found'",
+    "lint": "prettier --list-different . && eslint . --ext .ts || exit 1",
     "lint-fix": "prettier --write . && eslint . --ext .ts --fix",
     "dev": "node --watch -r ts-node/register index.ts",
     "run": "npm run build && node index.js",
