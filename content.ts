@@ -52,6 +52,18 @@ export type EditContentOpts = {
     content?: string;
 }
 
+export type ContentListItem = {
+    title: string;
+    latestVersion: number;
+    id: string;
+    Content(): Promise<Content>;
+}
+
+export type ContentListResult = { nextPage: () => Promise<ContentListResult>, content: ContentListItem[] };
+export type ContentListPaginationOptions = {
+    cursor?: string;
+    pageSize?: number;
+}
 
 export class Content {
     get id() {
@@ -86,7 +98,7 @@ export class Content {
     static async create(opts: CreateContentOptsStreaming): Promise<StreamingContentResult>;
     static async create(opts: CreateContentOptsSync | CreateContentOptsStreaming): Promise<Content | StreamingContentResult> {
         // note: this if statement is annoying but is necessary to appropriately narrow the return type
-        if(isCreateContentOptsSync(opts)) {
+        if (isCreateContentOptsSync(opts)) {
             return this.createContentSync(opts);
         } else {
             return this.createContentStreaming(opts);
@@ -95,16 +107,16 @@ export class Content {
     }
 
     private static async createContentSync(opts: CreateContentOptsSync): Promise<Content> {
-        const { client, cortex, title, prompt} = opts;
-            const res = await client.POST(`/content`, { cortex: cortex.name, title, prompt });
-            const body = await res.json();
-    
-            return new Content(client, body.id, body.title, body.content, body.commands, body.version);
+        const { client, cortex, title, prompt } = opts;
+        const res = await client.POST(`/content`, { cortex: cortex.name, title, prompt });
+        const body = await res.json();
+
+        return new Content(client, body.id, body.title, body.content, body.commands, body.version);
     }
 
     private static async createContentStreaming(opts: CreateContentOptsStreaming): Promise<StreamingContentResult> {
-        const { client, cortex, title, prompt, stream} = opts;
-        const res = await client.POST(`/content`, { cortex: cortex.name, title, prompt, stream});
+        const { client, cortex, title, prompt, stream } = opts;
+        const res = await client.POST(`/content`, { cortex: cortex.name, title, prompt, stream });
         const reader = res.body!.getReader();
         const decoder = new TextDecoder('utf-8');
 
@@ -115,17 +127,17 @@ export class Content {
         const readableStream = new Readable({
             read() { }
         });
-    
+
         const contentPromise = processStream(reader, decoder, readableStream, opts.statusStream).then(content => {
             return new Content(client, id, title, content, commands, version, cortex.name);
         });
 
-        return { contentStream: readableStream, content: contentPromise};
+        return { contentStream: readableStream, content: contentPromise };
     }
 
     static async get(client: CortexApiClient, id: string, version?: number): Promise<Content> {
         let res: Response;
-        if(version !== undefined) {
+        if (version !== undefined) {
             res = await client.GET(`/content/${id}/version/${version}`);
         } else {
             res = await client.GET(`/content/${id}`);
@@ -159,7 +171,7 @@ export class Content {
     async refine(opts: RefineContentOptsSync): Promise<Content>;
     async refine(opts: RefineContentOptsStreaming): Promise<StreamingContentResult>;
     async refine(opts: RefineContentOptsSync | RefineContentOptsStreaming): Promise<Content | StreamingContentResult> {
-        if(isRefineContentOptsSync(opts)) {
+        if (isRefineContentOptsSync(opts)) {
             return this.refineContentSync(opts);
         } else {
             return this.refineContentStreaming(opts);
@@ -193,13 +205,13 @@ export class Content {
         const readableStream = new Readable({
             read() { }
         });
-    
+
         const contentPromise = processStream(reader, decoder, readableStream, opts.statusStream).then(content => {
             this._content = content;
             return this;
         });
 
-        return { contentStream: readableStream, content: contentPromise};
+        return { contentStream: readableStream, content: contentPromise };
     }
 
     async revert(version: number) {
@@ -218,6 +230,33 @@ export class Content {
         this._cortex = body.cortex;
 
         return this;
+    }
+
+    static async list(client: CortexApiClient, paginationOpts?: ContentListPaginationOptions): Promise<ContentListResult> {
+        const content: ContentListItem[] = [];
+
+        const query = new URLSearchParams();
+        if (paginationOpts?.cursor) {
+            query.set("cursor", paginationOpts.cursor);
+        }
+        query.set("pageSize", (paginationOpts?.pageSize || 50).toString());
+        const res = await client.GET(`/content?${query.toString()}`);
+        if (res.status !== 200) {
+            throw new Error(`Failed to list content: ${res.statusText}`);
+        }
+        const body = await res.json();
+        for (let content of body.content) {
+            content.push({
+                title: content.title,
+                latestVersion: content.latestVersion,
+                id: content.contentId,
+                Content: () => { return Content.get(client, content.contentId) }
+            })
+        }
+
+        const cursor = body.cursor;
+        const pageSize = paginationOpts?.pageSize;
+        return { content, nextPage: async () => { return Content.list(client, { cursor, pageSize }) } };
     }
 }
 

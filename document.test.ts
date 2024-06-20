@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'vitest';
 import { CortexClient } from "./index";
 import { CatalogConfig } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from './document';
@@ -129,7 +129,7 @@ test('Test upsertDocuments with files and catalog.truncate', { timeout: 20000 },
   await catalog.delete();
 });
 
-test('Test update documents', {timeout: 10000}, async () => {
+test('Test update documents', { timeout: 10000 }, async () => {
 
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
 
@@ -176,7 +176,7 @@ test('Test update documents', {timeout: 10000}, async () => {
   await catalog.delete();
 });
 
-test('Test get and delete documents', {timeout: 10000}, async () => {
+test('Test get and delete documents', { timeout: 10000 }, async () => {
 
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
 
@@ -220,12 +220,12 @@ test('Test get and delete documents', {timeout: 10000}, async () => {
   await doc.delete();
 
   docCount = await catalog.documentCount();
-  expect(docCount).toBe(1); 
+  expect(docCount).toBe(1);
 
   await catalog.delete();
 });
 
-test('Test catalog.listDocuments', { timeout: 10000 } ,async () => {
+test('Test catalog.listDocuments', { timeout: 10000 }, async () => {
 
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
 
@@ -239,7 +239,7 @@ test('Test catalog.listDocuments', { timeout: 10000 } ,async () => {
   const docs: JSONDocument[] = [
   ];
 
-  for(let i = 0; i < 70; i++) {
+  for (let i = 0; i < 70; i++) {
     docs.push({
       documentId: `${i}`,
       contentType: "json",
@@ -266,7 +266,7 @@ test('Test catalog.listDocuments', { timeout: 10000 } ,async () => {
   expect(listDocsResult.documents.length).toBe(0);
 
   // paginate with page size: 70
-  listDocsResult = await catalog.listDocuments({ page: 1, pageSize: 70});
+  listDocsResult = await catalog.listDocuments({ page: 1, pageSize: 70 });
   expect(listDocsResult.documents.length).toBe(70);
   listDocsResult = await listDocsResult.nextPage();
   expect(listDocsResult.documents.length).toBe(0);
