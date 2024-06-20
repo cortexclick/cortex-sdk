@@ -41,6 +41,11 @@ export interface ClientCreateChatOptsSync extends ClientCreateChatOptsBase {
     stream?: false
 }
 
+export interface ClientListContentPaginationOpts {
+    pageSize?: number;
+    cursor?: string;
+}
+
 const apiUrl = process.env.CORTEX_API_URL || "https://api.cortexclick.com";
 
 export class CortexClient {
@@ -105,7 +110,7 @@ export class CortexClient {
         return Content.get(this.apiClient, id, version);
     }
 
-    async listContent(paginationOptions?: { pageSize?: number; cursor?: string }) {
+    async listContent(paginationOptions?: ClientListContentPaginationOpts) {
         return Content.list(this.apiClient, paginationOptions);
     }
 
