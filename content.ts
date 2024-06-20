@@ -233,7 +233,7 @@ export class Content {
     }
 
     static async list(client: CortexApiClient, paginationOpts?: ContentListPaginationOptions): Promise<ContentListResult> {
-        const content: ContentListItem[] = [];
+        const contentList: ContentListItem[] = [];
 
         const query = new URLSearchParams();
         if (paginationOpts?.cursor) {
@@ -245,8 +245,8 @@ export class Content {
             throw new Error(`Failed to list content: ${res.statusText}`);
         }
         const body = await res.json();
-        for (let content of body.content) {
-            content.push({
+        for (const content of body.content) {
+            contentList.push({
                 title: content.title,
                 latestVersion: content.latestVersion,
                 id: content.contentId,
@@ -256,7 +256,7 @@ export class Content {
 
         const cursor = body.cursor;
         const pageSize = paginationOpts?.pageSize;
-        return { content, nextPage: async () => { return Content.list(client, { cursor, pageSize }) } };
+        return { content: contentList, nextPage: async () => { return Content.list(client, { cursor, pageSize }) } };
     }
 }
 
