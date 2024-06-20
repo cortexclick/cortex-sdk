@@ -53,7 +53,7 @@ export class CortexClient {
     async chat(opts: ClientCreateChatOptsSync): Promise<Chat>;
     async chat(opts: ClientCreateChatOptsStreaming): Promise<StreamingChatResult>;
     async chat(opts: ClientCreateChatOptsSync | ClientCreateChatOptsStreaming): Promise<Chat | StreamingChatResult> {
-        if(opts.stream === true) {
+        if (opts.stream === true) {
             return Chat.create({
                 client: this.apiClient,
                 cortex: opts.cortex,
@@ -72,7 +72,7 @@ export class CortexClient {
         }
     }
 
-    async getChat(id: string){
+    async getChat(id: string) {
         return Chat.get(this.apiClient, id);
     }
 
@@ -80,7 +80,7 @@ export class CortexClient {
     async generateContent(opts: ClientCreateContentOptsStreaming): Promise<StreamingContentResult>
     async generateContent(opts: ClientCreateContentOptsSync | ClientCreateContentOptsStreaming) {
         // note: this if statement is annoying but is necessary to appropriately narrow the return type
-        if(opts.stream === true) {
+        if (opts.stream === true) {
             return Content.create({
                 client: this.apiClient,
                 cortex: opts.cortex,
@@ -105,7 +105,11 @@ export class CortexClient {
         return Content.get(this.apiClient, id, version);
     }
 
-    async listChats(){}
+    async listContent(paginationOptions?: { pageSize?: number; cursor?: string }) {
+        return Content.list(this.apiClient, paginationOptions);
+    }
+
+    async listChats() { }
 
     async getCortex(name: string): Promise<Cortex> {
         return Cortex.get(this.apiClient, name)
@@ -131,7 +135,7 @@ export class CortexClient {
         return Catalog.configure(this.apiClient, name, opts);
     }
 
-    async listCatalogs(){
+    async listCatalogs() {
         return Catalog.list(this.apiClient);
     }
 

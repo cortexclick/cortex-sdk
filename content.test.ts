@@ -10,12 +10,12 @@ const client = new CortexClient({
 });
 
 
-test('e2e catalog, cortex, and sync content generation workflow', {timeout: 120000}, async () => {
+test('e2e catalog, cortex, and sync content generation workflow', { timeout: 120000 }, async () => {
 
   client.configureOrg({
     companyName: "Cortex Click",
     companyInfo: "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
-    personality: [ "friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
+    personality: ["friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
     rules: ["never say anything disparaging about AI or LLMs", "do not offer discounts"],
   })
 
@@ -23,7 +23,7 @@ test('e2e catalog, cortex, and sync content generation workflow', {timeout: 1200
 
   const config: CatalogConfig = {
     description: "this catalog contains documentation from the cortex click marketing website",
-    instructions: [ "user this data set to answer user questions about the cortex click platform" ]
+    instructions: ["user this data set to answer user questions about the cortex click platform"]
   };
 
   // create
@@ -50,16 +50,16 @@ test('e2e catalog, cortex, and sync content generation workflow', {timeout: 1200
   await catalog.upsertDocuments(documents);
 
   const cortex = await client.configureCortex(`cortex-${Math.floor(Math.random() * 10000)}`, {
-    catalogs: [ catalog.name ],
+    catalogs: [catalog.name],
     friendlyName: "Cortex AI",
-    instructions: [ "answer questions about the cortex click AI GTM platform"],
+    instructions: ["answer questions about the cortex click AI GTM platform"],
     public: true,
   });
 
   // create content
   const title = "Overview of the Cortex Click AI GTM Platform";
   const prompt = "Write a blog post about the Cortex Click AI GTM Platform. Elaborate on scenarios, customers, and appropriate verticals. Make sure to mention the impact that AI can have on sales and marketing teams."
-  const content = await cortex.generateContent({title, prompt});
+  const content = await cortex.generateContent({ title, prompt });
   const originalContent = content.content;
   const originalTitle = content.title;
   expect(content.content.length).toBeGreaterThan(1);
@@ -75,7 +75,7 @@ test('e2e catalog, cortex, and sync content generation workflow', {timeout: 1200
   expect(getContent.commands.length).toBe(1);
 
   // edit content
-  const editedContent = await content.edit({title: "foo", content: "bar"});
+  const editedContent = await content.edit({ title: "foo", content: "bar" });
   expect(editedContent.content).toBe("bar");
   expect(editedContent.title).toBe("foo");
   expect(editedContent.version).toBe(1);
@@ -107,12 +107,12 @@ test('e2e catalog, cortex, and sync content generation workflow', {timeout: 1200
   await catalog.delete();
 });
 
-test('test streaming content', {timeout: 120000}, async () => {
+test('test streaming content', { timeout: 120000 }, async () => {
 
   client.configureOrg({
     companyName: "Cortex Click",
     companyInfo: "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
-    personality: [ "friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
+    personality: ["friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
     rules: ["never say anything disparaging about AI or LLMs", "do not offer discounts"],
   })
 
@@ -120,7 +120,7 @@ test('test streaming content', {timeout: 120000}, async () => {
 
   const config: CatalogConfig = {
     description: "this catalog contains documentation from the cortex click marketing website",
-    instructions: [ "user this data set to answer user questions about the cortex click platform" ]
+    instructions: ["user this data set to answer user questions about the cortex click platform"]
   };
 
   // create
@@ -147,9 +147,9 @@ test('test streaming content', {timeout: 120000}, async () => {
   await catalog.upsertDocuments(documents);
 
   const cortex = await client.configureCortex(`cortex-${Math.floor(Math.random() * 10000)}`, {
-    catalogs: [ catalog.name ],
+    catalogs: [catalog.name],
     friendlyName: "Cortex AI",
-    instructions: [ "answer questions about the cortex click AI GTM platform"],
+    instructions: ["answer questions about the cortex click AI GTM platform"],
     public: true,
   });
 
@@ -159,7 +159,7 @@ test('test streaming content', {timeout: 120000}, async () => {
   const statusStream = new Readable({
     read() { }
   });
-  const { content, contentStream } = await client.generateContent({ cortex, prompt, title, stream: true, statusStream});
+  const { content, contentStream } = await client.generateContent({ cortex, prompt, title, stream: true, statusStream });
   let fullContent = ""
   contentStream.on('data', (data) => {
     fullContent += data.toString();
@@ -172,7 +172,7 @@ test('test streaming content', {timeout: 120000}, async () => {
   statusStream.on('data', (data) => {
     const message = JSON.parse(data);
     expect(message.messageType).toBe("status");
-    switch(message.step) {
+    switch (message.step) {
       case "plan":
         sawPlan = true;
         break;
@@ -200,7 +200,7 @@ test('test streaming content', {timeout: 120000}, async () => {
 
   const refinedContentPromise = await contentResult.refine({ prompt: refinePrompt, stream: true });
   let fullRefinedContent = "";
-  refinedContentPromise.contentStream.on('data', (data)=> {
+  refinedContentPromise.contentStream.on('data', (data) => {
     fullRefinedContent += data.toString();
   });
 
@@ -218,13 +218,13 @@ test('e2e content without any catalogs', { timeout: 120000 }, async () => {
   client.configureOrg({
     companyName: "Cortex Click",
     companyInfo: "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
-    personality: [ "friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
+    personality: ["friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
     rules: ["never say anything disparaging about AI or LLMs", "do not offer discounts"],
   })
 
   const cortex = await client.configureCortex(`cortex-${Math.floor(Math.random() * 10000)}`, {
     friendlyName: "Cortex AI",
-    instructions: [ "answer questions about the cortex click AI GTM platform"],
+    instructions: ["answer questions about the cortex click AI GTM platform"],
     public: true,
   });
 
@@ -238,3 +238,43 @@ test('e2e content without any catalogs', { timeout: 120000 }, async () => {
   expect(content.version).toBe(0);
   expect(content.commands.length).toBe(1);
 });
+
+test('list content', { timeout: 120000 }, async () => {
+  client.configureOrg({
+    companyName: "Cortex Click",
+    companyInfo: "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
+    personality: ["friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
+    rules: ["never say anything disparaging about AI or LLMs", "do not offer discounts"],
+  })
+
+  const cortex = await client.configureCortex(`cortex-list-content-test`, {
+    friendlyName: "Cortex AI",
+    instructions: ["answer questions about the cortex click AI GTM platform"],
+    public: true,
+  });
+
+  // create content
+  const title = "Overview of the Cortex Click AI GTM Platform";
+  const prompt = "Write a blog post about the Cortex Click AI GTM Platform. Elaborate on scenarios, customers, and appropriate verticals. Make sure to mention the impact that AI can have on sales and marketing teams."
+  const content = await cortex.generateContent({ title, prompt });
+
+  let contentList = (await client.listContent({ pageSize: 200 }));
+  // find the thing we just created
+  while (contentList.contents.filter(c => c.id === content.id).length === 0 && contentList.contents.length > 0) {
+    contentList = await contentList.nextPage();
+  }
+  expect(contentList.contents.filter(c => c.id === content.id)).toHaveLength(1) // filter to just the stuff we created in this test
+  expect(contentList.contents.find(c => c.id === content.id)?.latestVersion).toBe(0);
+
+  // check that it returns multiple items
+  await client.generateContent({ cortex, title: "foo", prompt: "bar" });
+  const contentList3 = (await client.listContent());
+  expect(contentList3.contents.length).toBeGreaterThan(1);
+
+  // check that we can get the next page
+  const contentList4 = (await client.listContent({ pageSize: 1 }));
+  expect(contentList4.contents.length).toBe(1);
+  const contentList5 = await contentList4.nextPage();
+  expect(contentList5.contents.length).toBe(1);
+  expect(contentList5.contents[0].id).not.toBe(contentList4.contents[0].id);
+})
