@@ -25,7 +25,7 @@ export class OrgConfig {
      * A list of dos and don'ts that all written content should follow. i.e. ["do not speak disparigingly about X"] 
      */
     readonly rules?: string[];
-    private constructor(private client: CortexApiClient, input: OrgConfigOpts) {
+    private constructor(input: OrgConfigOpts) {
         this.companyName = input.companyName;
         this.companyInfo = input.companyInfo;
         this.personality = input.personality;
@@ -44,7 +44,7 @@ export class OrgConfig {
             personality: body.personality,
             rules: body.rules,
         }
-        return new OrgConfig(client, input);
+        return new OrgConfig(input);
     }
 
     static async configure(client: CortexApiClient, config: OrgConfigOpts): Promise<OrgConfig> {
@@ -60,6 +60,6 @@ export class OrgConfig {
             throw new Error(`Failed to configure org: ${res.statusText}`);
         }
 
-        return new OrgConfig(client, config);
+        return new OrgConfig(config);
     }
 }

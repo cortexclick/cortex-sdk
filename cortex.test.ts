@@ -17,7 +17,7 @@ test('can get and set OrgConfig', async () => {
     rules: ["never say anything disparaging about AI or LLMs", "do not offer discounts"],
   }
 
-  const orgConfig = await client.configureOrg(orgConfigOpts);
+  await client.configureOrg(orgConfigOpts);
 
   const getOrgConfig = await client.getOrgConfig();
   expect(getOrgConfig.companyName).toBe(orgConfigOpts.companyName)

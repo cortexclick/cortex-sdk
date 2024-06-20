@@ -15,11 +15,11 @@ export async function processStream(reader: ReadableStreamDefaultReader<Uint8Arr
         }
 
         buffer += decoder.decode(value, { stream: true });
-        let lines = buffer.split('\n');
+        const lines = buffer.split('\n');
 
         buffer = lines.pop() || '';
 
-        for (let line of lines) {
+        for (const line of lines) {
             if (line.trim()) {
                 try {
                     const json = JSON.parse(line);

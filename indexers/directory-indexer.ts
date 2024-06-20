@@ -2,8 +2,6 @@ import * as fs from 'node:fs';
 import { Catalog } from "../catalog.js";
 import { FileDocument } from '../document.js';
 
-const apiUrl = process.env.HOST === "prod" ? "https://api.cortexclick.com" : "http://localhost:3001"
-
 export type DirectoryIndexerOpts = {
     rootDir: string;
     urlBase?: string;
@@ -15,7 +13,6 @@ export type DirectoryIndexerOpts = {
 }
 
 export class DirectoryIndexer {
-    private outstandingRequests: Promise<any>[] = [];
     private parallelism = 25;
     private rootDir: string;
     private urlBase?: string;
@@ -55,9 +52,9 @@ export class DirectoryIndexer {
     }
 
     private async processDirectory(docPathList: string[], sitePathList: string[]) {
-        let fileList = fs.readdirSync(docPathList.join("/"));
+        const fileList = fs.readdirSync(docPathList.join("/"));
 
-        for (let f of fileList) {
+        for (const f of fileList) {
             const path = [...docPathList, f].join("/")
             const stat = fs.lstatSync(path)
             if (stat.isDirectory() && this.includeDirectory(f)) {

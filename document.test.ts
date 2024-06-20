@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { CortexClient } from "./index";
-import { Catalog, CatalogConfig } from "./catalog";
+import { CatalogConfig } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from './document';
 
 const client = new CortexClient({
@@ -19,7 +19,7 @@ test('Test upsertDocuments inline text batch', async () => {
     instructions: ["a", "b"],
   };
 
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const docs: TextDocument[] = [
     {
@@ -55,7 +55,7 @@ test('Test upsertDocuments inline JSON batch', async () => {
     instructions: ["a", "b"],
   };
 
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const docs: JSONDocument[] = [
     {
@@ -97,7 +97,7 @@ test('Test upsertDocuments with files and catalog.truncate', { timeout: 20000 },
     instructions: ["a", "b"],
   };
 
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const docs: FileDocument[] = [
     {
@@ -138,7 +138,7 @@ test('Test update documents', {timeout: 10000}, async () => {
     instructions: ["a", "b"],
   };
 
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const docs: TextDocument[] = [
     {
@@ -185,7 +185,7 @@ test('Test get and delete documents', {timeout: 10000}, async () => {
     instructions: ["a", "b"],
   };
 
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const docs: TextDocument[] = [
     {
@@ -234,7 +234,7 @@ test('Test catalog.listDocuments', { timeout: 10000 } ,async () => {
     instructions: ["a", "b"],
   };
 
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const docs: JSONDocument[] = [
   ];

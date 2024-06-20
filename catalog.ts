@@ -75,7 +75,7 @@ export class Catalog {
             throw new Error(`Failed to list catalog: ${res.statusText}`);
         }
         const body = await res.json();
-        for(let catalog of body.catalogs) {
+        for(const catalog of body.catalogs) {
             result.push({
                 name: catalog.name,
                 description: catalog.description,
@@ -111,7 +111,7 @@ export class Catalog {
         let hasText = false;
         let hasFile = false;
         let hasJson = false; 
-        for(let doc of batch) {
+        for(const doc of batch) {
             switch(doc.contentType) {
                 case "markdown":
                 case "text":
@@ -124,6 +124,7 @@ export class Catalog {
                     hasFile = true;
                     break;
                 default:
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     throw new Error(`unsupported content type: ${(doc as any).contentType}`);
             }
         }
@@ -172,7 +173,7 @@ export class Catalog {
     }
 
     async listDocuments(paginationOpts?: DocumentPaginationOpts): Promise<DocumentListResult> {
-        let { page, pageSize } = paginationOpts || { page: 1, pageSize: 50};
+        const { page, pageSize } = paginationOpts || { page: 1, pageSize: 50};
         const nextPageOpts: DocumentPaginationOpts = { page: page+1, pageSize };
         const nextPage = () => {
             return this.listDocuments(nextPageOpts);
@@ -192,6 +193,7 @@ export class Catalog {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     jsonIndexer(documents: any[], opts?: JSONIndexerOpts) {
         return new JSONIndexer(this, documents, opts);
     }
@@ -218,9 +220,8 @@ export class Catalog {
 const mapBatch = async (batch: DocumentBatch) => {
     const blobs: Promise<Blob>[] = [];
     const documents: DocumentInput[] = [];
-    let isFileUpload = false;
 
-    for(let doc of batch) {
+    for(const doc of batch) {
         switch(doc.contentType) {
             case "markdown":
             case "text":
@@ -235,7 +236,6 @@ const mapBatch = async (batch: DocumentBatch) => {
                 });
                 break;
             case "file":
-                isFileUpload = true;
                 blobs.push(fs.openAsBlob(doc.filePath));
                 documents.push({
                     ...doc,
@@ -243,6 +243,7 @@ const mapBatch = async (batch: DocumentBatch) => {
                 });
                 break;
             default:
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 throw new Error(`unsupported content type: ${(doc as any).contentType}`);
         }
     }

@@ -92,13 +92,13 @@ export class ShopifyIndexer {
     }
 
     private async deleteProducts(): Promise<void> {
-        for (let id of this.idsToDelete) {
+        for (const id of this.idsToDelete) {
             if (this.deletes.length >= this.parallelism) {
                 await Promise.all(this.deletes);
                 this.deletes = [];
             }
 
-            const res = this.catalog.deleteDocument(id).catch((e) => {});
+            const res = this.catalog.deleteDocument(id).catch(() => {});
             this.deletes.push(res);
         }
 

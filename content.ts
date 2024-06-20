@@ -85,8 +85,6 @@ export class Content {
     static async create(opts: CreateContentOptsSync): Promise<Content>;
     static async create(opts: CreateContentOptsStreaming): Promise<StreamingContentResult>;
     static async create(opts: CreateContentOptsSync | CreateContentOptsStreaming): Promise<Content | StreamingContentResult> {
-        const { client, cortex, title, prompt, stream} = opts;
-
         // note: this if statement is annoying but is necessary to appropriately narrow the return type
         if(isCreateContentOptsSync(opts)) {
             return this.createContentSync(opts);
@@ -187,7 +185,6 @@ export class Content {
         const reader = res.body!.getReader();
         const decoder = new TextDecoder('utf-8');
 
-        const id: string = res.headers.get("id") || "";
         const version: number = parseInt(res.headers.get("version") || "0");
         const commands: ContentCommand[] = JSON.parse(res.headers.get("commands") || "[]");
         this._version = version;

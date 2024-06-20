@@ -27,7 +27,7 @@ test('e2e catalog, cortex, and sync content generation workflow', {timeout: 1200
   };
 
   // create
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const documents: TextDocument[] = [
     {
@@ -124,7 +124,7 @@ test('test streaming content', {timeout: 120000}, async () => {
   };
 
   // create
-  let catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await client.configureCatalog(catalogName, config);
 
   const documents: TextDocument[] = [
     {
