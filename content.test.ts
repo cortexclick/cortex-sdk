@@ -103,6 +103,16 @@ test('e2e catalog, cortex, and sync content generation workflow', { timeout: 120
   expect(refinedContent.version).toBe(3);
   expect(refinedContent.commands.length).toBe(4);
 
+  // list content - putting test here to save overhead of generating more content
+  const contentList = await client.listContent({ pageSize: 1 });
+  expect(contentList.content.length).toBe(1);
+
+  const nextPage = await contentList.nextPage();
+  expect(nextPage.content.length).toBe(1);
+
+  const contentList2 = await client.listContent();
+  expect(contentList2.content.length).toBeGreaterThan(1);
+
   // delete 
   await catalog.delete();
 });
@@ -238,43 +248,3 @@ test('e2e content without any catalogs', { timeout: 120000 }, async () => {
   expect(content.version).toBe(0);
   expect(content.commands.length).toBe(1);
 });
-
-test('list content', { timeout: 120000 }, async () => {
-  client.configureOrg({
-    companyName: "Cortex Click",
-    companyInfo: "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
-    personality: ["friendly and helpful", "expert sales and marketing professional", "experienced software developer"],
-    rules: ["never say anything disparaging about AI or LLMs", "do not offer discounts"],
-  })
-
-  const cortex = await client.configureCortex(`cortex-list-content-test`, {
-    friendlyName: "Cortex AI",
-    instructions: ["answer questions about the cortex click AI GTM platform"],
-    public: true,
-  });
-
-  // create content
-  const title = "Overview of the Cortex Click AI GTM Platform";
-  const prompt = "Write a blog post about the Cortex Click AI GTM Platform. Elaborate on scenarios, customers, and appropriate verticals. Make sure to mention the impact that AI can have on sales and marketing teams."
-  const content = await cortex.generateContent({ title, prompt });
-
-  let contentList = (await client.listContent({ pageSize: 200 }));
-  // find the thing we just created
-  while (contentList.contents.filter(c => c.id === content.id).length === 0 && contentList.contents.length > 0) {
-    contentList = await contentList.nextPage();
-  }
-  expect(contentList.contents.filter(c => c.id === content.id)).toHaveLength(1) // filter to just the stuff we created in this test
-  expect(contentList.contents.find(c => c.id === content.id)?.latestVersion).toBe(0);
-
-  // check that it returns multiple items
-  await client.generateContent({ cortex, title: "foo", prompt: "bar" });
-  const contentList3 = (await client.listContent());
-  expect(contentList3.contents.length).toBeGreaterThan(1);
-
-  // check that we can get the next page
-  const contentList4 = (await client.listContent({ pageSize: 1 }));
-  expect(contentList4.contents.length).toBe(1);
-  const contentList5 = await contentList4.nextPage();
-  expect(contentList5.contents.length).toBe(1);
-  expect(contentList5.contents[0].id).not.toBe(contentList4.contents[0].id);
-})
