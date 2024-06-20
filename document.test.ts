@@ -1,7 +1,7 @@
-import { expect, test } from 'vitest';
+import { expect, test } from "vitest";
 import { CortexClient } from "./index";
 import { CatalogConfig } from "./catalog";
-import { FileDocument, JSONDocument, TextDocument } from './document';
+import { FileDocument, JSONDocument, TextDocument } from "./document";
 
 const client = new CortexClient({
   accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
@@ -9,10 +9,8 @@ const client = new CortexClient({
   apiUrl: "http://localhost:3001",
 });
 
-
-test('Test upsertDocuments inline text batch', async () => {
-
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
+test("Test upsertDocuments inline text batch", async () => {
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
     description: "foo bar",
@@ -27,15 +25,15 @@ test('Test upsertDocuments inline text batch', async () => {
       contentType: "markdown",
       content: "# some markdown",
       url: "https://foo.com",
-      imageUrl: "https://foo.com/image.jpg"
+      imageUrl: "https://foo.com/image.jpg",
     },
     {
       documentId: "2",
       contentType: "markdown",
       content: "# some more markdown",
       url: "https://foo.com/2",
-      imageUrl: "https://foo.com/image2.jpg"
-    }
+      imageUrl: "https://foo.com/image2.jpg",
+    },
   ];
 
   await catalog.upsertDocuments(docs);
@@ -46,9 +44,8 @@ test('Test upsertDocuments inline text batch', async () => {
   await catalog.delete();
 });
 
-test('Test upsertDocuments inline JSON batch', async () => {
-
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
+test("Test upsertDocuments inline JSON batch", async () => {
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
     description: "foo bar",
@@ -63,21 +60,21 @@ test('Test upsertDocuments inline JSON batch', async () => {
       contentType: "json",
       content: {
         foo: "buzz",
-        a: [5, 6, 7]
+        a: [5, 6, 7],
       },
       url: "https://foo.com",
-      imageUrl: "https://foo.com/image.jpg"
+      imageUrl: "https://foo.com/image.jpg",
     },
     {
       documentId: "2",
       contentType: "json",
       content: {
         foo: "bar",
-        a: [1, 2, 3]
+        a: [1, 2, 3],
       },
       url: "https://foo.com/2",
-      imageUrl: "https://foo.com/image2.jpg"
-    }
+      imageUrl: "https://foo.com/image2.jpg",
+    },
   ];
 
   await catalog.upsertDocuments(docs);
@@ -88,50 +85,52 @@ test('Test upsertDocuments inline JSON batch', async () => {
   await catalog.delete();
 });
 
-test('Test upsertDocuments with files and catalog.truncate', { timeout: 20000 }, async () => {
+test(
+  "Test upsertDocuments with files and catalog.truncate",
+  { timeout: 20000 },
+  async () => {
+    const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
+    const config: CatalogConfig = {
+      description: "foo bar",
+      instructions: ["a", "b"],
+    };
 
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
+    const catalog = await client.configureCatalog(catalogName, config);
 
-  const catalog = await client.configureCatalog(catalogName, config);
+    const docs: FileDocument[] = [
+      {
+        documentId: "1",
+        contentType: "file",
+        filePath: "./test_data/large_markdown_with_code.mdx",
+        url: "https://foo.com",
+        imageUrl: "https://foo.com/image.jpg",
+      },
+      {
+        documentId: "2",
+        contentType: "file",
+        filePath: "./test_data/test_large_docx_file.docx",
+        url: "https://foo.com/2",
+        imageUrl: "https://foo.com/image2.jpg",
+      },
+    ];
 
-  const docs: FileDocument[] = [
-    {
-      documentId: "1",
-      contentType: "file",
-      filePath: "./test_data/large_markdown_with_code.mdx",
-      url: "https://foo.com",
-      imageUrl: "https://foo.com/image.jpg"
-    },
-    {
-      documentId: "2",
-      contentType: "file",
-      filePath: "./test_data/test_large_docx_file.docx",
-      url: "https://foo.com/2",
-      imageUrl: "https://foo.com/image2.jpg"
-    }
-  ];
+    await catalog.upsertDocuments(docs);
 
-  await catalog.upsertDocuments(docs);
+    let docCount = await catalog.documentCount();
+    expect(docCount).toBe(2);
 
-  let docCount = await catalog.documentCount();
-  expect(docCount).toBe(2);
+    await catalog.truncate();
 
-  await catalog.truncate();
+    docCount = await catalog.documentCount();
+    expect(docCount).toBe(0);
 
-  docCount = await catalog.documentCount();
-  expect(docCount).toBe(0);
+    await catalog.delete();
+  },
+);
 
-  await catalog.delete();
-});
-
-test('Test update documents', { timeout: 10000 }, async () => {
-
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
+test("Test update documents", { timeout: 10000 }, async () => {
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
     description: "foo bar",
@@ -146,15 +145,15 @@ test('Test update documents', { timeout: 10000 }, async () => {
       contentType: "markdown",
       content: "# some markdown",
       url: "https://foo.com",
-      imageUrl: "https://foo.com/image.jpg"
+      imageUrl: "https://foo.com/image.jpg",
     },
     {
       documentId: "2",
       contentType: "markdown",
       content: "# some more markdown",
       url: "https://foo.com/2",
-      imageUrl: "https://foo.com/image2.jpg"
-    }
+      imageUrl: "https://foo.com/image2.jpg",
+    },
   ];
 
   await catalog.upsertDocuments(docs);
@@ -176,9 +175,8 @@ test('Test update documents', { timeout: 10000 }, async () => {
   await catalog.delete();
 });
 
-test('Test get and delete documents', { timeout: 10000 }, async () => {
-
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
+test("Test get and delete documents", { timeout: 10000 }, async () => {
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
     description: "foo bar",
@@ -193,15 +191,15 @@ test('Test get and delete documents', { timeout: 10000 }, async () => {
       contentType: "markdown",
       content: "# some markdown",
       url: "https://foo.com",
-      imageUrl: "https://foo.com/image.jpg"
+      imageUrl: "https://foo.com/image.jpg",
     },
     {
       documentId: "2",
       contentType: "markdown",
       content: "# some more markdown",
       url: "https://foo.com/2",
-      imageUrl: "https://foo.com/image2.jpg"
-    }
+      imageUrl: "https://foo.com/image2.jpg",
+    },
   ];
 
   await catalog.upsertDocuments(docs);
@@ -225,9 +223,8 @@ test('Test get and delete documents', { timeout: 10000 }, async () => {
   await catalog.delete();
 });
 
-test('Test catalog.listDocuments', { timeout: 10000 }, async () => {
-
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`
+test("Test catalog.listDocuments", { timeout: 10000 }, async () => {
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
     description: "foo bar",
@@ -236,8 +233,7 @@ test('Test catalog.listDocuments', { timeout: 10000 }, async () => {
 
   const catalog = await client.configureCatalog(catalogName, config);
 
-  const docs: JSONDocument[] = [
-  ];
+  const docs: JSONDocument[] = [];
 
   for (let i = 0; i < 70; i++) {
     docs.push({
@@ -245,11 +241,11 @@ test('Test catalog.listDocuments', { timeout: 10000 }, async () => {
       contentType: "json",
       content: {
         foo: "buzz",
-        a: [5, 6, 7]
+        a: [5, 6, 7],
       },
       url: "https://foo.com",
-      imageUrl: "https://foo.com/image.jpg"
-    },)
+      imageUrl: "https://foo.com/image.jpg",
+    });
   }
 
   await catalog.upsertDocuments(docs);
