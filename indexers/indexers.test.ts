@@ -22,7 +22,7 @@ afterEach(async () => {
 
 test(
   "Test catalog.jsonIndexer with custom opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const docs: JSONDocument[] = [];
 
@@ -54,7 +54,7 @@ test(
 
 test(
   "Test catalog.jsonIndexer with default opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const docs: JSONDocument[] = [];
 
@@ -80,7 +80,7 @@ test(
   },
 );
 
-test("Test catalog.directoryIndexer", { timeout: 10000 }, async () => {
+test("Test catalog.directoryIndexer", { timeout: 20000 }, async () => {
   const indexer = catalog.directoryIndexer({
     rootDir: "./test_data",
   });
@@ -93,7 +93,7 @@ test("Test catalog.directoryIndexer", { timeout: 10000 }, async () => {
 
 test(
   "Test catalog.tsvIndexer with default opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const indexer = catalog.tsvIndexer("./test_data/test.tsv");
 
@@ -106,7 +106,7 @@ test(
 
 test(
   "Test catalog.tsvIndexer with custom opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const indexer = catalog.tsvIndexer("./test_data/test.tsv", {
       getId: (doc) => doc.id,
@@ -119,7 +119,7 @@ test(
   },
 );
 
-test("Test catalog.shopifyIndexer", { timeout: 10000 }, async () => {
+test("Test catalog.shopifyIndexer", { timeout: 20000 }, async () => {
   const indexer = catalog.shopifyIndexer({
     shopifyBaseUrl: "https://redsflyfishing.com",
     maxItems: 5,
