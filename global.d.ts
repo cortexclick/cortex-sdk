@@ -2,7 +2,8 @@
 import { CortexClient } from "./index";
 
 declare global {
-  let testClient: CortexClient;
+  // eslint-disable-next-line no-var
+  var testClient: CortexClient;
 }
 
 export {};
