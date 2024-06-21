@@ -64,4 +64,7 @@ jobs:
         run: npm install
 
       - name: Run tests
+        env:
+          CORTEX_ORG: ${{ secrets.CORTEX_ORG }}
+          CORTEX_ACCESS_TOKEN: ${{ secrets.CORTEX_ACCESS_TOKEN }}
         run: npm run test:ci
