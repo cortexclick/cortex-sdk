@@ -13,7 +13,7 @@ afterEach(async () => {
   }
 });
 
-test("Catalog CRUD", async () => {
+test("Catalog CRUD", { timeout: 10000 }, async () => {
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {

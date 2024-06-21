@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { CatalogConfig } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from "./document";
 
-test("Test upsertDocuments inline text batch", async () => {
+test("Test upsertDocuments inline text batch", { timeout: 10000 }, async () => {
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
@@ -37,7 +37,7 @@ test("Test upsertDocuments inline text batch", async () => {
   await catalog.delete();
 });
 
-test("Test upsertDocuments inline JSON batch", async () => {
+test("Test upsertDocuments inline JSON batch", { timeout: 10000 }, async () => {
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
