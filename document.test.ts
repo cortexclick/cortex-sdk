@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { CatalogConfig } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from "./document";
+import { testClient } from "./vitest-test-client";
 
 test("Test upsertDocuments inline text batch", { timeout: 10000 }, async () => {
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;

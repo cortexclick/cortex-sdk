@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { TextDocument } from "./index";
 import { CatalogConfig } from "./catalog";
+import { testClient } from "./vitest-test-client";
 import { Readable } from "stream";
 
 test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
