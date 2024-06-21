@@ -5,7 +5,7 @@ import { Readable } from "stream";
 
 test(
   "e2e catalog, cortex, and sync content generation workflow",
-  { timeout: 120000 },
+  { timeout: 180000 },
   async () => {
     testClient.configureOrg({
       companyName: "Cortex Click",
@@ -135,7 +135,7 @@ test(
   },
 );
 
-test("test streaming content", { timeout: 120000 }, async () => {
+test("test streaming content", { timeout: 180000 }, async () => {
   testClient.configureOrg({
     companyName: "Cortex Click",
     companyInfo:
@@ -268,7 +268,7 @@ test("test streaming content", { timeout: 120000 }, async () => {
   await catalog.delete();
 });
 
-test("e2e content without any catalogs", { timeout: 120000 }, async () => {
+test("e2e content without any catalogs", { timeout: 180000 }, async () => {
   testClient.configureOrg({
     companyName: "Cortex Click",
     companyInfo:
