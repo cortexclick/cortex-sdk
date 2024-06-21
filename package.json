@@ -24,7 +24,8 @@
     "dev": "node --watch -r ts-node/register index.ts",
     "run": "npm run build && node index.js",
     "test": "pulumi env run npm-test vitest .ts",
-    "indexer-test": "pulumi env run npm-test vitest indexers.test.ts"
+    "indexer-test": "pulumi env run npm-test vitest indexers.test.ts",
+    "document-test": "pulumi env run npm-test vitest document.test.ts"
   },
   "keywords": [],
   "author": "",

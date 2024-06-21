@@ -1,6 +1,6 @@
-import { expect, test } from "vitest";
+import { expect, test, beforeEach, afterEach } from "vitest";
 import { CortexClient } from "./index";
-import { CatalogConfig } from "./catalog";
+import { CatalogConfig, Catalog } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from "./document";
 
 const client = new CortexClient({
@@ -9,16 +9,25 @@ const client = new CortexClient({
   apiUrl: "http://localhost:3001",
 });
 
-test("Test upsertDocuments inline text batch", async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+let catalog: Catalog;
 
+beforeEach(async () => {
   const config: CatalogConfig = {
     description: "foo bar",
     instructions: ["a", "b"],
   };
 
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+  catalog = await client.configureCatalog(catalogName, config);
+});
 
+afterEach(async () => {
+  if (catalog) {
+    await catalog.delete();
+  }
+});
+
+test("Test upsertDocuments inline text batch", async () => {
   const docs: TextDocument[] = [
     {
       documentId: "1",
@@ -40,20 +49,9 @@ test("Test upsertDocuments inline text batch", async () => {
 
   const docCount = await catalog.documentCount();
   expect(docCount).toBe(2);
-
-  await catalog.delete();
 });
 
 test("Test upsertDocuments inline JSON batch", async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await client.configureCatalog(catalogName, config);
-
   const docs: JSONDocument[] = [
     {
       documentId: "1",
@@ -81,23 +79,12 @@ test("Test upsertDocuments inline JSON batch", async () => {
 
   const docCount = await catalog.documentCount();
   expect(docCount).toBe(2);
-
-  await catalog.delete();
 });
 
 test(
   "Test upsertDocuments with files and catalog.truncate",
   { timeout: 20000 },
   async () => {
-    const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-    const config: CatalogConfig = {
-      description: "foo bar",
-      instructions: ["a", "b"],
-    };
-
-    const catalog = await client.configureCatalog(catalogName, config);
-
     const docs: FileDocument[] = [
       {
         documentId: "1",
@@ -124,21 +111,9 @@ test(
 
     docCount = await catalog.documentCount();
     expect(docCount).toBe(0);
-
-    await catalog.delete();
-  },
-);
+  });
 
 test("Test update documents", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await client.configureCatalog(catalogName, config);
-
   const docs: TextDocument[] = [
     {
       documentId: "1",
@@ -171,20 +146,9 @@ test("Test update documents", { timeout: 10000 }, async () => {
 
   docCount = await catalog.documentCount();
   expect(docCount).toBe(2);
-
-  await catalog.delete();
 });
 
 test("Test get and delete documents", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await client.configureCatalog(catalogName, config);
-
   const docs: TextDocument[] = [
     {
       documentId: "1",
@@ -219,20 +183,9 @@ test("Test get and delete documents", { timeout: 10000 }, async () => {
 
   docCount = await catalog.documentCount();
   expect(docCount).toBe(1);
-
-  await catalog.delete();
 });
 
 test("Test catalog.listDocuments", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await client.configureCatalog(catalogName, config);
-
   const docs: JSONDocument[] = [];
 
   for (let i = 0; i < 70; i++) {
@@ -266,6 +219,30 @@ test("Test catalog.listDocuments", { timeout: 10000 }, async () => {
   expect(listDocsResult.documents.length).toBe(70);
   listDocsResult = await listDocsResult.nextPage();
   expect(listDocsResult.documents.length).toBe(0);
+});
 
-  await catalog.delete();
+test("Test searchDocuments", { timeout: 10000 }, async () => {
+  const docs: TextDocument[] = [
+    {
+      documentId: "1",
+      contentType: "markdown",
+      content: "# some markdown",
+      url: "https://foo.com",
+      imageUrl: "https://foo.com/image.jpg",
+    },
+    {
+      documentId: "2",
+      contentType: "markdown",
+      content: "# some more markdown",
+      url: "https://foo.com/2",
+      imageUrl: "https://foo.com/image2.jpg",
+    },
+  ];
+
+  await catalog.upsertDocuments(docs);
+
+  await new Promise(r => setTimeout(r, 5000)); // need to wait for the documents to be indexed by turbopuffer
+
+  const res = await catalog.searchDocuments("markdown");
+  expect(res.results.length).toBe(2);
 });
