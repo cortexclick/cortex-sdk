@@ -111,7 +111,8 @@ test(
 
     docCount = await catalog.documentCount();
     expect(docCount).toBe(0);
-  });
+  },
+);
 
 test("Test update documents", { timeout: 10000 }, async () => {
   const docs: TextDocument[] = [
@@ -241,7 +242,7 @@ test("Test searchDocuments", { timeout: 10000 }, async () => {
 
   await catalog.upsertDocuments(docs);
 
-  await new Promise(r => setTimeout(r, 5000)); // need to wait for the documents to be indexed by turbopuffer
+  await new Promise((r) => setTimeout(r, 5000)); // need to wait for the documents to be indexed by turbopuffer
 
   const res = await catalog.searchDocuments("markdown");
   expect(res.results.length).toBe(2);

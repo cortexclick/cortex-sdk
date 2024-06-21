@@ -182,10 +182,13 @@ export class Catalog {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async searchDocuments(query: string): Promise<any> {
     this.checkDeleted();
 
-    const res = await this.apiClient.GET(`/catalogs/${this.name}/search?query=${query}`);
+    const res = await this.apiClient.GET(
+      `/catalogs/${this.name}/search?query=${query}`,
+    );
     if (res.status !== 200) {
       throw new Error(`Failed to search documents: ${res.statusText}`);
     }
