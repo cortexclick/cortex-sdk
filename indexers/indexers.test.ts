@@ -1,13 +1,6 @@
 import { expect, test, beforeEach, afterEach } from "vitest";
-import { CortexClient } from "../index";
 import { Catalog, CatalogConfig } from "../catalog";
 import { JSONDocument } from "../document";
-
-const client = new CortexClient({
-  accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
-  org: "cortex-click-test",
-  apiUrl: "http://localhost:3001",
-});
 
 let catalog: Catalog;
 
@@ -18,7 +11,7 @@ beforeEach(async () => {
   };
 
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-  catalog = await client.configureCatalog(catalogName, config);
+  catalog = await testClient.configureCatalog(catalogName, config);
 });
 
 afterEach(async () => {

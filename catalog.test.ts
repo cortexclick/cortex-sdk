@@ -1,12 +1,5 @@
 import { expect, test, afterEach } from "vitest";
-import { CortexClient } from "./index";
 import { Catalog, CatalogConfig } from "./catalog";
-
-const client = new CortexClient({
-  accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
-  org: "cortex-click-test",
-  apiUrl: "http://localhost:3001",
-});
 
 let catalog: Catalog;
 
@@ -29,19 +22,19 @@ test("Catalog CRUD", async () => {
   };
 
   // create
-  catalog = await client.configureCatalog(catalogName, config);
+  catalog = await testClient.configureCatalog(catalogName, config);
 
   // get
-  catalog = await client.getCatalog(catalogName);
+  catalog = await testClient.getCatalog(catalogName);
   expect(catalog.config.instructions).toStrictEqual(config.instructions);
   expect(catalog.config.description).toBe(config.description);
 
   // update
   config.description = "buzz 123";
   config.instructions = ["1", "2", "3"];
-  catalog = await client.configureCatalog(catalogName, config);
+  catalog = await testClient.configureCatalog(catalogName, config);
 
-  catalog = await client.getCatalog(catalogName);
+  catalog = await testClient.getCatalog(catalogName);
   expect(catalog.config.instructions).toStrictEqual(config.instructions);
   expect(catalog.config.description).toBe(config.description);
 
@@ -51,7 +44,7 @@ test("Catalog CRUD", async () => {
   expect(docCount).toBe(0);
 
   // list
-  const catalogList = await client.listCatalogs();
+  const catalogList = await testClient.listCatalogs();
   const catalogFromList = catalogList.find((c) => c.name === catalogName);
   expect(catalogFromList).toBeDefined();
   expect(catalogFromList?.documentCount).toBe(0);
@@ -66,6 +59,6 @@ test("Catalog CRUD", async () => {
   await catalog.delete();
   // assert that the get fails
   await expect(async () => {
-    await client.getCatalog(catalogName);
+    await testClient.getCatalog(catalogName);
   }).rejects.toThrowError("Failed to get catalog: Not Found");
 });

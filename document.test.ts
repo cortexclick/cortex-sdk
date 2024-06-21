@@ -1,13 +1,6 @@
 import { expect, test } from "vitest";
-import { CortexClient } from "./index";
 import { CatalogConfig } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from "./document";
-
-const client = new CortexClient({
-  accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
-  org: "cortex-click-test",
-  apiUrl: "http://localhost:3001",
-});
 
 test("Test upsertDocuments inline text batch", async () => {
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
@@ -17,7 +10,7 @@ test("Test upsertDocuments inline text batch", async () => {
     instructions: ["a", "b"],
   };
 
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const docs: TextDocument[] = [
     {
@@ -52,7 +45,7 @@ test("Test upsertDocuments inline JSON batch", async () => {
     instructions: ["a", "b"],
   };
 
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const docs: JSONDocument[] = [
     {
@@ -96,7 +89,7 @@ test(
       instructions: ["a", "b"],
     };
 
-    const catalog = await client.configureCatalog(catalogName, config);
+    const catalog = await testClient.configureCatalog(catalogName, config);
 
     const docs: FileDocument[] = [
       {
@@ -137,7 +130,7 @@ test("Test update documents", { timeout: 10000 }, async () => {
     instructions: ["a", "b"],
   };
 
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const docs: TextDocument[] = [
     {
@@ -183,7 +176,7 @@ test("Test get and delete documents", { timeout: 10000 }, async () => {
     instructions: ["a", "b"],
   };
 
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const docs: TextDocument[] = [
     {
@@ -231,7 +224,7 @@ test("Test catalog.listDocuments", { timeout: 10000 }, async () => {
     instructions: ["a", "b"],
   };
 
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const docs: JSONDocument[] = [];
 
