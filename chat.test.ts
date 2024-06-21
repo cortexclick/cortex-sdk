@@ -1,16 +1,10 @@
 import { expect, test } from "vitest";
-import { CortexClient, TextDocument } from "./index";
+import { TextDocument } from "./index";
 import { CatalogConfig } from "./catalog";
 import { Readable } from "stream";
 
-const client = new CortexClient({
-  accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
-  org: "cortex-click-test",
-  apiUrl: "http://localhost:3001",
-});
-
 test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
-  client.configureOrg({
+  testClient.configureOrg({
     companyName: "Cortex Click",
     companyInfo:
       "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
@@ -36,7 +30,7 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
   };
 
   // create
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const documents: TextDocument[] = [
     {
@@ -60,7 +54,7 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
 
   await catalog.upsertDocuments(documents);
 
-  const cortex = await client.configureCortex(
+  const cortex = await testClient.configureCortex(
     `cortex-${Math.floor(Math.random() * 10000)}`,
     {
       catalogs: [catalog.name],
@@ -76,7 +70,7 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
   expect(chat.messages[1].message.length).toBeGreaterThan(0);
 
   // get chat
-  const getChatRes = await client.getChat(chat.id);
+  const getChatRes = await testClient.getChat(chat.id);
   expect(getChatRes.messages.length).toBe(2);
   expect(getChatRes.title).toBe(chatInput);
 
@@ -85,7 +79,7 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
   expect(chat.messages.length).toBe(4);
 
   // list chats
-  const chatList = await client.listChats({ pageSize: 1 });
+  const chatList = await testClient.listChats({ pageSize: 1 });
   expect(chatList.chats.length).toBe(1);
 
   const nextPage = await chatList.nextPage();
@@ -97,7 +91,7 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
 });
 
 test("streaming chat", { timeout: 60000 }, async () => {
-  client.configureOrg({
+  testClient.configureOrg({
     companyName: "Cortex Click",
     companyInfo:
       "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
@@ -123,7 +117,7 @@ test("streaming chat", { timeout: 60000 }, async () => {
   };
 
   // create
-  const catalog = await client.configureCatalog(catalogName, config);
+  const catalog = await testClient.configureCatalog(catalogName, config);
 
   const documents: TextDocument[] = [
     {
@@ -147,7 +141,7 @@ test("streaming chat", { timeout: 60000 }, async () => {
 
   await catalog.upsertDocuments(documents);
 
-  const cortex = await client.configureCortex(
+  const cortex = await testClient.configureCortex(
     `cortex-${Math.floor(Math.random() * 10000)}`,
     {
       catalogs: [catalog.name],

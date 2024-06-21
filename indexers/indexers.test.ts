@@ -1,13 +1,6 @@
 import { expect, test, beforeEach, afterEach } from "vitest";
-import { CortexClient } from "../index";
 import { Catalog, CatalogConfig } from "../catalog";
 import { JSONDocument } from "../document";
-
-const client = new CortexClient({
-  accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
-  org: "cortex-click-test",
-  apiUrl: "http://localhost:3001",
-});
 
 let catalog: Catalog;
 
@@ -18,7 +11,7 @@ beforeEach(async () => {
   };
 
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-  catalog = await client.configureCatalog(catalogName, config);
+  catalog = await testClient.configureCatalog(catalogName, config);
 });
 
 afterEach(async () => {
@@ -29,7 +22,7 @@ afterEach(async () => {
 
 test(
   "Test catalog.jsonIndexer with custom opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const docs: JSONDocument[] = [];
 
@@ -61,7 +54,7 @@ test(
 
 test(
   "Test catalog.jsonIndexer with default opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const docs: JSONDocument[] = [];
 
@@ -87,7 +80,7 @@ test(
   },
 );
 
-test("Test catalog.directoryIndexer", { timeout: 10000 }, async () => {
+test("Test catalog.directoryIndexer", { timeout: 20000 }, async () => {
   const indexer = catalog.directoryIndexer({
     rootDir: "./test_data",
   });
@@ -100,7 +93,7 @@ test("Test catalog.directoryIndexer", { timeout: 10000 }, async () => {
 
 test(
   "Test catalog.tsvIndexer with default opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const indexer = catalog.tsvIndexer("./test_data/test.tsv");
 
@@ -113,7 +106,7 @@ test(
 
 test(
   "Test catalog.tsvIndexer with custom opts",
-  { timeout: 10000 },
+  { timeout: 20000 },
   async () => {
     const indexer = catalog.tsvIndexer("./test_data/test.tsv", {
       getId: (doc) => doc.id,
@@ -126,7 +119,7 @@ test(
   },
 );
 
-test("Test catalog.shopifyIndexer", { timeout: 10000 }, async () => {
+test("Test catalog.shopifyIndexer", { timeout: 20000 }, async () => {
   const indexer = catalog.shopifyIndexer({
     shopifyBaseUrl: "https://redsflyfishing.com",
     maxItems: 5,

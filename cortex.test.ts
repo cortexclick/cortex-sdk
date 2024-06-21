@@ -1,13 +1,6 @@
 import { expect, test } from "vitest";
-import { CortexClient } from "./index";
 import { OrgConfigOpts } from "./org";
 import { CortexConfig } from "./cortex";
-
-const client = new CortexClient({
-  accessToken: process.env.CORTEX_ACCESS_TOKEN || "",
-  org: "cortex-click-test",
-  apiUrl: "http://localhost:3001",
-});
 
 test("can get and set OrgConfig", async () => {
   const orgConfigOpts: OrgConfigOpts = {
@@ -25,9 +18,9 @@ test("can get and set OrgConfig", async () => {
     ],
   };
 
-  await client.configureOrg(orgConfigOpts);
+  await testClient.configureOrg(orgConfigOpts);
 
-  const getOrgConfig = await client.getOrgConfig();
+  const getOrgConfig = await testClient.getOrgConfig();
   expect(getOrgConfig.companyName).toBe(orgConfigOpts.companyName);
   expect(getOrgConfig.companyInfo).toBe(orgConfigOpts.companyInfo);
 });
@@ -58,9 +51,9 @@ test("can configure, get, and delete and Cortexes", async () => {
     },
   };
 
-  let cortex = await client.configureCortex(cortexName, cortexConfig);
+  let cortex = await testClient.configureCortex(cortexName, cortexConfig);
 
-  cortex = await client.getCortex(cortexName);
+  cortex = await testClient.getCortex(cortexName);
   expect(cortex.config.catalogs).toStrictEqual(cortexConfig.catalogs);
   // TODO - check all the properties
 
@@ -68,6 +61,6 @@ test("can configure, get, and delete and Cortexes", async () => {
   await cortex.delete();
   // assert that the get failes
   await expect(async () => {
-    await client.getCortex(cortexName);
+    await testClient.getCortex(cortexName);
   }).rejects.toThrowError("Failed to get cortex: Not Found");
 });

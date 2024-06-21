@@ -23,8 +23,14 @@
     "lint-fix": "prettier --write . && eslint . --ext .ts --fix",
     "dev": "node --watch -r ts-node/register index.ts",
     "run": "npm run build && node index.js",
-    "test": "pulumi env run npm-test vitest .ts",
-    "indexer-test": "pulumi env run npm-test vitest indexers.test.ts"
+    "test": "vitest",
+    "test:fast": "vitest run --exclude content.test.ts",
+    "test:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test npm run test",
+    "test:ci": "vitest run",
+    "test:prod": "pulumi env run npm-test npm run test",
+    "test:fast:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test npm run test:fast",
+    "test:fast:prod": "pulumi env run npm-test npm run test:fast",
+    "test:indexers:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test vitest indexers.test.ts"
   },
   "keywords": [],
   "author": "",

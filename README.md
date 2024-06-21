@@ -21,8 +21,16 @@ Import your knowledgebase (markdown, json, text, html, etc), configure specializ
 
 # Running Tests
 
-This repo uses `vitest` to run tests. There is a pulumi environment called `npm-test` that has an org token for the `cortex-click-test` org for the purposes of running the SDK e2e tests.
+This repo uses `vitest` to run tests.
 
-```console
-$ pulumi env run npm-test npm run test
-```
+**NOTE**: some of these test hit Cortex Click endpoints for content and chat generation that consume credits.
+
+To run tests you'll need to set the following environment variables:
+
+1.  `CORTEX_ORG`: The name of your Cortex Click org. Tests will be run under this account.
+1.  `CORTEX_ACCESS_TOKEN`: The access token (org or personal) used to authenticate with the Cortex API.
+
+There are two test targets:
+
+1. `npm run test` run the full suite of test in watch mode
+2. `npm run test:fast` a faster version of the suite that skips longer running tests (like content generation).
