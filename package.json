@@ -30,7 +30,8 @@
     "test:prod": "pulumi env run npm-test npm run test",
     "test:fast:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test npm run test:fast",
     "test:fast:prod": "pulumi env run npm-test npm run test:fast",
-    "test:indexers:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test vitest indexers.test.ts"
+    "test:indexers:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test vitest indexers.test.ts",
+    "test:document:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test vitest document.test.ts"
   },
   "keywords": [],
   "author": "",

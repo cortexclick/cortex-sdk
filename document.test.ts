@@ -1,17 +1,26 @@
-import { expect, test } from "vitest";
-import { CatalogConfig } from "./catalog";
+import { expect, test, beforeEach, afterEach } from "vitest";
+import { CatalogConfig, Catalog } from "./catalog";
 import { FileDocument, JSONDocument, TextDocument } from "./document";
 
-test("Test upsertDocuments inline text batch", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+let catalog: Catalog;
 
+beforeEach(async () => {
   const config: CatalogConfig = {
     description: "foo bar",
     instructions: ["a", "b"],
   };
 
-  const catalog = await testClient.configureCatalog(catalogName, config);
+  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+  catalog = await testClient.configureCatalog(catalogName, config);
+});
 
+afterEach(async () => {
+  if (catalog) {
+    await catalog.delete();
+  }
+});
+
+test("Test upsertDocuments inline text batch", { timeout: 10000 }, async () => {
   const docs: TextDocument[] = [
     {
       documentId: "1",
@@ -33,20 +42,9 @@ test("Test upsertDocuments inline text batch", { timeout: 10000 }, async () => {
 
   const docCount = await catalog.documentCount();
   expect(docCount).toBe(2);
-
-  await catalog.delete();
 });
 
 test("Test upsertDocuments inline JSON batch", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await testClient.configureCatalog(catalogName, config);
-
   const docs: JSONDocument[] = [
     {
       documentId: "1",
@@ -74,23 +72,12 @@ test("Test upsertDocuments inline JSON batch", { timeout: 10000 }, async () => {
 
   const docCount = await catalog.documentCount();
   expect(docCount).toBe(2);
-
-  await catalog.delete();
 });
 
 test(
   "Test upsertDocuments with files and catalog.truncate",
   { timeout: 20000 },
   async () => {
-    const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-    const config: CatalogConfig = {
-      description: "foo bar",
-      instructions: ["a", "b"],
-    };
-
-    const catalog = await testClient.configureCatalog(catalogName, config);
-
     const docs: FileDocument[] = [
       {
         documentId: "1",
@@ -117,8 +104,6 @@ test(
 
     docCount = await catalog.documentCount();
     expect(docCount).toBe(0);
-
-    await catalog.delete();
   },
 );
 
@@ -164,20 +149,9 @@ test("Test update documents", { timeout: 10000 }, async () => {
 
   docCount = await catalog.documentCount();
   expect(docCount).toBe(2);
-
-  await catalog.delete();
 });
 
 test("Test get and delete documents", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await testClient.configureCatalog(catalogName, config);
-
   const docs: TextDocument[] = [
     {
       documentId: "1",
@@ -212,20 +186,9 @@ test("Test get and delete documents", { timeout: 10000 }, async () => {
 
   docCount = await catalog.documentCount();
   expect(docCount).toBe(1);
-
-  await catalog.delete();
 });
 
 test("Test catalog.listDocuments", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
-
-  const config: CatalogConfig = {
-    description: "foo bar",
-    instructions: ["a", "b"],
-  };
-
-  const catalog = await testClient.configureCatalog(catalogName, config);
-
   const docs: JSONDocument[] = [];
 
   for (let i = 0; i < 70; i++) {
@@ -259,6 +222,4 @@ test("Test catalog.listDocuments", { timeout: 10000 }, async () => {
   expect(listDocsResult.documents.length).toBe(70);
   listDocsResult = await listDocsResult.nextPage();
   expect(listDocsResult.documents.length).toBe(0);
-
-  await catalog.delete();
 });
