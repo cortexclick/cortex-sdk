@@ -1,0 +1,8 @@
+**/*.test.ts
+**/*.test.d.ts
+.gitignore
+test_data
+.prettier*
+.eslint*
+.nvm*
+vitest*

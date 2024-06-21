@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { OrgConfigOpts } from "./org";
 import { CortexConfig } from "./cortex";
+import { testClient } from "./vitest-test-client";
 
 test("can get and set OrgConfig", async () => {
   const orgConfigOpts: OrgConfigOpts = {

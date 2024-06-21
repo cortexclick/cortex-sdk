@@ -13,7 +13,7 @@
     "typescript-eslint": "^7.13.1",
     "vitest": "^1.6.0"
   },
-  "name": "cortex-sdk",
+  "name": "@cortexclick/cortex-sdk",
   "version": "0.0.1",
   "type": "module",
   "main": "index.js",

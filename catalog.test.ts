@@ -1,5 +1,6 @@
 import { expect, test, afterEach } from "vitest";
 import { Catalog, CatalogConfig } from "./catalog";
+import { testClient } from "./vitest-test-client";
 
 let catalog: Catalog;
 
