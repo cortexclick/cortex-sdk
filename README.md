@@ -1,5 +1,7 @@
 # Cortex Click Node.js SDK
 
+Requires Node.js v20+
+
 ```
 npm install @cortexclick/cortex
 ```
