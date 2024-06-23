@@ -6,7 +6,7 @@ Requires Node.js v20+
 npm install @cortexclick/cortex
 ```
 
-The Cortex SDK let's you automate sales and marketing scenarios and accelerate your GTM motion with AI.
+The Cortex SDK let's you automate sales and marketing scenarios and accelerate your go-to-market (GTM) motion with AI.
 
 `cortexes` are AI agents that you can configure with custom instructions for various sales and marketing workflows. Cortex Click provides seemless integration with all of you internal GTM data. Index your data into the platform, and make it available to `cortexes` to increase the quality of generated content. Including built-in indexers for:
 
