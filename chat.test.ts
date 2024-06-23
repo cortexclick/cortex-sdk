@@ -85,7 +85,7 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
 
   const nextPage = await chatList.nextPage();
   expect(nextPage.chats.length).toBe(1);
-  expect(nextPage.chats[0].id).not.toBe(chat.id);
+  expect(nextPage.chats[0].id).not.toBe(chatList.chats[0].id);
 
   // delete
   await catalog.delete();
