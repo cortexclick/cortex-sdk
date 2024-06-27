@@ -44,13 +44,17 @@ export interface ClientCreateChatOptsSync extends ClientCreateChatOptsBase {
   stream?: false;
 }
 
-export interface ClientListContentPaginationOpts {
+export interface ClientListContentOpts {
   pageSize?: number;
   cursor?: string;
+  userEmail?: string | null;
+  cortexName?: string;
 }
-export interface ClientListChatPaginationOpts {
+export interface ClientListChatOpts {
   pageSize?: number;
   cursor?: string;
+  userEmail?: string | null;
+  cortexName?: string;
 }
 
 const apiUrl = process.env.CORTEX_API_URL || "https://api.cortexclick.com";
@@ -123,11 +127,11 @@ export class CortexClient {
     return Content.get(this.apiClient, id, version);
   }
 
-  async listContent(paginationOptions?: ClientListContentPaginationOpts) {
-    return Content.list(this.apiClient, paginationOptions);
+  async listContent(options?: ClientListContentOpts) {
+    return Content.list(this.apiClient, options);
   }
-  async listChats(paginationOptions?: ClientListChatPaginationOpts) {
-    return Chat.list(this.apiClient, paginationOptions);
+  async listChats(options?: ClientListChatOpts) {
+    return Chat.list(this.apiClient, options);
   }
 
   async getCortex(name: string): Promise<Cortex> {
