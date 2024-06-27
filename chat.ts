@@ -52,9 +52,11 @@ export interface ChatListResult {
   chats: ChatListItem[];
   nextPage: () => Promise<ChatListResult>;
 }
-export interface ChatListPaginationOpts {
+export interface ChatListOpts {
   cursor?: string;
   pageSize?: number;
+  userEmail?: string | null;
+  cortexName?: string;
 }
 
 export type Message = {
@@ -155,15 +157,23 @@ export class Chat {
 
   static async list(
     client: CortexApiClient,
-    paginationOpts?: ChatListPaginationOpts,
+    opts?: ChatListOpts,
   ): Promise<ChatListResult> {
     const chats: ChatListItem[] = [];
 
     const query = new URLSearchParams();
-    if (paginationOpts?.cursor) {
-      query.set("cursor", paginationOpts.cursor);
+    if (opts?.cursor) {
+      query.set("cursor", opts.cursor);
     }
-    query.set("pageSize", (paginationOpts?.pageSize || 50).toString());
+    if (opts?.userEmail) {
+      query.set("userEmail", opts.userEmail);
+    } else if (opts?.userEmail === null) {
+      query.set("userEmail", "null");
+    }
+    if (opts?.cortexName) {
+      query.set("cortexName", opts.cortexName);
+    }
+    query.set("pageSize", (opts?.pageSize || 50).toString());
     const res = await client.GET(`/chats?${query.toString()}`);
     if (res.status !== 200) {
       throw new Error(`Failed to list chats: ${res.statusText}`);
@@ -184,7 +194,7 @@ export class Chat {
     }
 
     const cursor = body.cursor;
-    const pageSize = paginationOpts?.pageSize;
+    const pageSize = opts?.pageSize;
     return {
       chats,
       nextPage: async () => Chat.list(client, { cursor, pageSize }),

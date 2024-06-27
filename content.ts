@@ -71,9 +71,11 @@ export type ContentListResult = {
   nextPage: () => Promise<ContentListResult>;
   content: ContentListItem[];
 };
-export type ContentListPaginationOptions = {
+export type ContentListOptions = {
   cursor?: string;
   pageSize?: number;
+  userEmail?: string | null;
+  cortexName?: string;
 };
 
 export class Content {
@@ -325,15 +327,23 @@ export class Content {
 
   static async list(
     client: CortexApiClient,
-    paginationOpts?: ContentListPaginationOptions,
+    opts?: ContentListOptions,
   ): Promise<ContentListResult> {
     const contentList: ContentListItem[] = [];
 
     const query = new URLSearchParams();
-    if (paginationOpts?.cursor) {
-      query.set("cursor", paginationOpts.cursor);
+    if (opts?.cursor) {
+      query.set("cursor", opts.cursor);
     }
-    query.set("pageSize", (paginationOpts?.pageSize || 50).toString());
+    if (opts?.userEmail) {
+      query.set("userEmail", opts.userEmail);
+    } else if (opts?.userEmail === null) {
+      query.set("userEmail", "null");
+    }
+    if (opts?.cortexName) {
+      query.set("cortexName", opts.cortexName);
+    }
+    query.set("pageSize", (opts?.pageSize || 50).toString());
     const res = await client.GET(`/content?${query.toString()}`);
     if (res.status !== 200) {
       throw new Error(`Failed to list content: ${res.statusText}`);
@@ -354,7 +364,7 @@ export class Content {
     }
 
     const cursor = body.cursor;
-    const pageSize = paginationOpts?.pageSize;
+    const pageSize = opts?.pageSize;
     return {
       content: contentList,
       nextPage: async () => Content.list(client, { cursor, pageSize }),
