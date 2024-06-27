@@ -43,6 +43,9 @@ export interface ChatListItem {
   title: string;
   id: string;
   messageCount: number;
+  userEmail?: string;
+  cortexName: string;
+  createdAt: string;
   Chat(): Promise<Chat>;
 }
 export interface ChatListResult {
@@ -171,6 +174,9 @@ export class Chat {
         title: chat.title,
         id: chat.chatId,
         messageCount: chat.messageCount,
+        userEmail: chat.userEmail,
+        cortexName: chat.cortexName,
+        createdAt: chat.createdAt,
         Chat: () => {
           return Chat.get(client, chat.chatId);
         },
@@ -181,9 +187,7 @@ export class Chat {
     const pageSize = paginationOpts?.pageSize;
     return {
       chats,
-      nextPage: async () => {
-        return Chat.list(client, { cursor, pageSize });
-      },
+      nextPage: async () => Chat.list(client, { cursor, pageSize }),
     };
   }
 

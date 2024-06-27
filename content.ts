@@ -61,6 +61,9 @@ export type ContentListItem = {
   title: string;
   latestVersion: number;
   id: string;
+  userEmail?: string;
+  cortexName: string;
+  createdAt: string;
   Content(): Promise<Content>;
 };
 
@@ -341,6 +344,9 @@ export class Content {
         title: content.title,
         latestVersion: content.latestVersion,
         id: content.contentId,
+        userEmail: content.userEmail,
+        cortexName: content.cortexName,
+        createdAt: content.createdAt,
         Content: () => {
           return Content.get(client, content.contentId);
         },
@@ -351,9 +357,7 @@ export class Content {
     const pageSize = paginationOpts?.pageSize;
     return {
       content: contentList,
-      nextPage: async () => {
-        return Content.list(client, { cursor, pageSize });
-      },
+      nextPage: async () => Content.list(client, { cursor, pageSize }),
     };
   }
 }
