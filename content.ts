@@ -103,6 +103,14 @@ export class Content {
     return this._cortex;
   }
 
+  get userEmail() {
+    return this._userEmail;
+  }
+
+  get createdAt() {
+    return this._createdAt;
+  }
+
   private constructor(
     private apiClient: CortexApiClient,
     private _id: string,
@@ -110,7 +118,9 @@ export class Content {
     private _content: string,
     private _commands: ContentCommand[],
     private _version: number,
+    private _createdAt: string,
     private _cortex?: string,
+    private _userEmail?: string,
   ) {}
 
   static async create(opts: CreateContentOptsSync): Promise<Content>;
@@ -146,6 +156,9 @@ export class Content {
       body.content,
       body.commands,
       body.version,
+      body.createdAt,
+      body.cortex,
+      body.userEmail,
     );
   }
 
@@ -164,6 +177,8 @@ export class Content {
 
     const id: string = res.headers.get("id") || "";
     const version: number = parseInt(res.headers.get("version") || "0");
+    const userEmail = res.headers.get("userEmail") || undefined;
+    const createdAt: string = res.headers.get("createdAt") || "";
     const commands: ContentCommand[] = JSON.parse(
       res.headers.get("commands") || "[]",
     );
@@ -185,7 +200,9 @@ export class Content {
         content,
         commands,
         version,
+        createdAt,
         cortex.name,
+        userEmail,
       );
     });
 
@@ -216,7 +233,9 @@ export class Content {
       body.content,
       body.commands,
       body.version,
+      body.createdAt,
       body.cortex,
+      body.userEmail,
     );
   }
 
@@ -235,6 +254,8 @@ export class Content {
     this._title = body.title;
     this._version = body.version;
     this._cortex = body.cortex;
+    this._userEmail = body.userEmail;
+    this._createdAt = body.createdAt;
 
     return this;
   }
@@ -266,6 +287,8 @@ export class Content {
     this._title = body.title;
     this._version = body.version;
     this._cortex = body.cortex;
+    this._userEmail = body.userEmail;
+    this._createdAt = body.createdAt;
 
     return this;
   }
@@ -282,11 +305,15 @@ export class Content {
     const decoder = new TextDecoder("utf-8");
 
     const version: number = parseInt(res.headers.get("version") || "0");
+    const createdAt = res.headers.get("createdAt") || "";
+    const userEmail = res.headers.get("userEmail") || undefined;
     const commands: ContentCommand[] = JSON.parse(
       res.headers.get("commands") || "[]",
     );
     this._version = version;
     this._commands = commands;
+    this._createdAt = createdAt;
+    this._userEmail = userEmail;
 
     const readableStream = new Readable({
       read() {},
@@ -321,6 +348,8 @@ export class Content {
     this._title = body.title;
     this._version = body.version;
     this._cortex = body.cortex;
+    this._userEmail = body.userEmail;
+    this._createdAt = body.createdAt;
 
     return this;
   }

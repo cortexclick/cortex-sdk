@@ -70,6 +70,8 @@ export class Chat {
     readonly id: string,
     readonly title: string,
     readonly messages: Message[],
+    readonly createdAt: string,
+    readonly userEmail?: string,
   ) {}
 
   static async create(opts: CreateChatOptsSync): Promise<Chat>;
@@ -102,7 +104,14 @@ export class Chat {
         message: body.response,
       },
     ];
-    return new Chat(client, body.id, body.title, messages);
+    return new Chat(
+      client,
+      body.id,
+      body.title,
+      messages,
+      body.createdAt,
+      body.userEmail,
+    );
   }
 
   private static async createContentStreaming(
@@ -119,6 +128,8 @@ export class Chat {
 
     const id: string = res.headers.get("id") || "";
     const title: string = res.headers.get("title") || "";
+    const createdAt: string = res.headers.get("createdAt") || "";
+    const userEmail = res.headers.get("userEmail") || undefined;
 
     const readableStream = new Readable({
       read() {},
@@ -140,7 +151,7 @@ export class Chat {
           message: content,
         },
       ];
-      return new Chat(client, id, title, messages);
+      return new Chat(client, id, title, messages, createdAt, userEmail);
     });
 
     return { responseStream: readableStream, chat: chatPromise };
@@ -152,7 +163,14 @@ export class Chat {
       throw new Error(`Failed to get chat: ${res.statusText}`);
     }
     const body = await res.json();
-    return new Chat(client, id, body.title, body.messages);
+    return new Chat(
+      client,
+      id,
+      body.title,
+      body.messages,
+      body.createdAt,
+      body.userEmail,
+    );
   }
 
   static async list(
