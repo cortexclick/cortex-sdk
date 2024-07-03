@@ -5,13 +5,14 @@ import { JSONDocument } from "../document.js";
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
 export type JSONIndexerOpts = {
+  batchSize?: number;
   getId?: (document: any) => string;
   getUrl?: (document: any) => string | undefined;
   getImageUrl?: (document: any) => string | undefined;
 };
 
 export class JSONIndexer {
-  private readonly parallelism = 50;
+  private readonly batchSize: number;
   private readonly getId: (document: any) => string;
   private readonly getImageUrl: (document: any) => string | undefined;
   private readonly getUrl: (document: any) => string | undefined;
@@ -22,6 +23,7 @@ export class JSONIndexer {
     private documents: any[],
     opts?: JSONIndexerOpts,
   ) {
+    this.batchSize = opts?.batchSize ?? 50;
     this.getId = opts?.getId ?? JSONIndexer.defaultGetId;
     this.getUrl = opts?.getUrl ?? JSONIndexer.defaultGetUrl;
     this.getImageUrl = opts?.getImageUrl ?? JSONIndexer.defaultGetImageUrl;
@@ -74,7 +76,7 @@ export class JSONIndexer {
 
   private async indexItems(): Promise<void> {
     for (const document of this.documents) {
-      if (this.batch.length > this.parallelism) {
+      if (this.batch.length > this.batchSize) {
         await this.catalog.upsertDocuments(this.batch);
         this.batch = [];
       }
