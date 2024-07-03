@@ -99,7 +99,9 @@ export class ShopifyIndexer {
   }
 
   private async indexProducts(): Promise<void> {
-    const indexer = this.catalog.jsonIndexer(this.documents, { batchSize: this.batchSize });
+    const indexer = this.catalog.jsonIndexer(this.documents, {
+      batchSize: this.batchSize,
+    });
     await indexer.index();
   }
 

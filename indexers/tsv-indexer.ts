@@ -20,7 +20,7 @@ export class TSVIndexer {
   private readonly fieldMapping: undefined | { [key: string]: string };
   private readonly batchSize?: number;
   private documents: any[] = [];
-  
+
   constructor(
     public catalog: Catalog,
     private file: string,
@@ -67,7 +67,9 @@ export class TSVIndexer {
       });
     }
 
-    const jsonIndexer = this.catalog.jsonIndexer(this.documents, { batchSize: this.batchSize });
+    const jsonIndexer = this.catalog.jsonIndexer(this.documents, {
+      batchSize: this.batchSize,
+    });
 
     await jsonIndexer.index();
   }

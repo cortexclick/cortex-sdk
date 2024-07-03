@@ -24,7 +24,7 @@ export class DirectoryIndexer {
   ) {
     this.rootDir = opts.rootDir;
     this.urlBase = opts.urlBase;
-    this.batchSize = opts.batchSize ?? 25; 
+    this.batchSize = opts.batchSize ?? 25;
 
     if (opts.includeFile) {
       this.includeFile = opts.includeFile;
