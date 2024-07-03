@@ -6,6 +6,7 @@ import { JSONIndexer } from "./json-indexer.js";
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
 export type TSVIndexerOpts = {
+  batchSize?: number;
   getId?: (item: any) => string;
   getUrl?: (item: any) => string;
   getImageUrl?: (item: any) => string;
@@ -16,9 +17,10 @@ export class TSVIndexer {
   private readonly getId: (document: any) => string;
   private readonly getImageUrl: (document: any) => string | undefined;
   private readonly getUrl: (document: any) => string | undefined;
+  private readonly fieldMapping: undefined | { [key: string]: string };
+  private readonly batchSize?: number;
   private documents: any[] = [];
-  private fieldMapping: undefined | { [key: string]: string };
-
+  
   constructor(
     public catalog: Catalog,
     private file: string,
@@ -27,6 +29,7 @@ export class TSVIndexer {
     this.getId = opts?.getId ?? JSONIndexer.defaultGetId;
     this.getUrl = opts?.getUrl ?? JSONIndexer.defaultGetUrl;
     this.getImageUrl = opts?.getImageUrl ?? JSONIndexer.defaultGetImageUrl;
+    this.batchSize = opts?.batchSize;
 
     if (opts?.fieldMapping) {
       this.fieldMapping = opts?.fieldMapping;
@@ -64,7 +67,7 @@ export class TSVIndexer {
       });
     }
 
-    const jsonIndexer = this.catalog.jsonIndexer(this.documents);
+    const jsonIndexer = this.catalog.jsonIndexer(this.documents, { batchSize: this.batchSize });
 
     await jsonIndexer.index();
   }
