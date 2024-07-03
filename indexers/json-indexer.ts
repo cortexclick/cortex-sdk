@@ -5,7 +5,7 @@ import { JSONDocument } from "../document.js";
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
 export type JSONIndexerOpts = {
-  batchSize?: number | undefined;
+  batchSize?: number;
   getId?: (document: any) => string;
   getUrl?: (document: any) => string | undefined;
   getImageUrl?: (document: any) => string | undefined;
