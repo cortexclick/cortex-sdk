@@ -10,6 +10,9 @@ export type ContentCommandType =
   | "user-edit"
   | "revert";
 
+export type ContentStatus = "DRAFT" | "IN_REVIEW" | "APPROVED" | "PUBLISHED";
+export type SettableContentStatus = "DRAFT" | "IN_REVIEW" | "APPROVED";
+
 export interface CreateContentOptsBase {
   client: CortexApiClient;
   cortex: Cortex;
@@ -111,6 +114,14 @@ export class Content {
     return this._createdAt;
   }
 
+  get status(): ContentStatus {
+    return this._status;
+  }
+
+  get publishedVersion(): number | undefined {
+    return this._publishedVersion;
+  }
+
   private constructor(
     private apiClient: CortexApiClient,
     private _id: string,
@@ -119,8 +130,10 @@ export class Content {
     private _commands: ContentCommand[],
     private _version: number,
     private _createdAt: string,
+    private _status: ContentStatus = "DRAFT",
     private _cortex?: string,
     private _userEmail?: string,
+    private _publishedVersion?: number,
   ) {}
 
   static async create(opts: CreateContentOptsSync): Promise<Content>;
@@ -157,8 +170,10 @@ export class Content {
       body.commands,
       body.version,
       body.createdAt,
+      body.status,
       body.cortex,
       body.userEmail,
+      body.publishedVersion || undefined,
     );
   }
 
@@ -179,6 +194,12 @@ export class Content {
     const version: number = parseInt(res.headers.get("version") || "0");
     const userEmail = res.headers.get("userEmail") || undefined;
     const createdAt: string = res.headers.get("createdAt") || "";
+    const status: ContentStatus = res.headers.get("status") as ContentStatus;
+    const publishedVersionStr: string | undefined =
+      res.headers.get("publishedVersion") || undefined;
+    const publishedVersion: number | undefined = publishedVersionStr
+      ? parseInt(publishedVersionStr)
+      : undefined;
     const commands: ContentCommand[] = JSON.parse(
       res.headers.get("commands") || "[]",
     );
@@ -201,8 +222,10 @@ export class Content {
         commands,
         version,
         createdAt,
+        status,
         cortex.name,
         userEmail,
+        publishedVersion,
       );
     });
 
@@ -234,8 +257,10 @@ export class Content {
       body.commands,
       body.version,
       body.createdAt,
+      body.status,
       body.cortex,
       body.userEmail,
+      body.publishedVersion || undefined,
     );
   }
 
@@ -256,6 +281,8 @@ export class Content {
     this._cortex = body.cortex;
     this._userEmail = body.userEmail;
     this._createdAt = body.createdAt;
+    this._publishedVersion = body.publishedVersion || undefined;
+    this._status = body.status;
 
     return this;
   }
@@ -289,6 +316,8 @@ export class Content {
     this._cortex = body.cortex;
     this._userEmail = body.userEmail;
     this._createdAt = body.createdAt;
+    this._publishedVersion = body.publishedVersion || undefined;
+    this._status = body.status;
 
     return this;
   }
@@ -310,10 +339,18 @@ export class Content {
     const commands: ContentCommand[] = JSON.parse(
       res.headers.get("commands") || "[]",
     );
+    const status = res.headers.get("status") as ContentStatus;
+    const publishedVersionStr: string | undefined =
+      res.headers.get("publishedVersion") || undefined;
+    const publishedVersion: number | undefined = publishedVersionStr
+      ? parseInt(publishedVersionStr)
+      : undefined;
     this._version = version;
     this._commands = commands;
     this._createdAt = createdAt;
     this._userEmail = userEmail;
+    this._status = status;
+    this._publishedVersion = publishedVersion;
 
     const readableStream = new Readable({
       read() {},
@@ -350,6 +387,8 @@ export class Content {
     this._cortex = body.cortex;
     this._userEmail = body.userEmail;
     this._createdAt = body.createdAt;
+    this._publishedVersion = body.publishedVersion || undefined;
+    this._status = body.status;
 
     return this;
   }
