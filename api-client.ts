@@ -64,7 +64,7 @@ export class CortexApiClient {
 
   private static getFormDataSize(formData: FormData) {
     return [...formData].reduce(
-      (size, [name, value]) =>
+      (size, [_, value]) =>
         size + (typeof value === "string" ? value.length : value.size),
       0,
     );
