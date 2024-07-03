@@ -15,10 +15,11 @@ type Product = {
 export type ShopifyIndexerOpts = {
   shopifyBaseUrl: string;
   maxItems?: number;
+  batchSize?: number;
 };
 
 export class ShopifyIndexer {
-  private parallelism = 25;
+  private readonly batchSize: number;
   private documents: Product[] = [];
   private deletes: Promise<void>[] = [];
   private idsToDelete: string[] = [];
@@ -26,7 +27,9 @@ export class ShopifyIndexer {
   constructor(
     private catalog: Catalog,
     private opts: ShopifyIndexerOpts,
-  ) {}
+  ) {
+    this.batchSize = opts.batchSize ?? 25;
+  }
 
   private stripHTML(input: string) {
     return input.replace(/<\/?[^>]+(>|$)/g, "");
@@ -96,13 +99,13 @@ export class ShopifyIndexer {
   }
 
   private async indexProducts(): Promise<void> {
-    const indexer = this.catalog.jsonIndexer(this.documents);
+    const indexer = this.catalog.jsonIndexer(this.documents, { batchSize: this.batchSize });
     await indexer.index();
   }
 
   private async deleteProducts(): Promise<void> {
     for (const id of this.idsToDelete) {
-      if (this.deletes.length >= this.parallelism) {
+      if (this.deletes.length >= this.batchSize) {
         await Promise.all(this.deletes);
         this.deletes = [];
       }
