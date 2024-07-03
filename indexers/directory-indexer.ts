@@ -5,6 +5,7 @@ import { FileDocument } from "../document.js";
 export type DirectoryIndexerOpts = {
   rootDir: string;
   urlBase?: string;
+  batchSize?: number;
   getUrl?: (docPathList: string[], sitePathList: string[]) => string;
   getId?: (docPathList: string[], sitePathList: string[]) => string;
   getImageUrl?: (docPathList: string[], sitePathList: string[]) => string;
@@ -13,9 +14,9 @@ export type DirectoryIndexerOpts = {
 };
 
 export class DirectoryIndexer {
-  private parallelism = 25;
-  private rootDir: string;
-  private urlBase?: string;
+  private readonly batchSize: number;
+  private readonly rootDir: string;
+  private readonly urlBase?: string;
   private files: FileDocument[] = [];
   constructor(
     public catalog: Catalog,
@@ -23,6 +24,7 @@ export class DirectoryIndexer {
   ) {
     this.rootDir = opts.rootDir;
     this.urlBase = opts.urlBase;
+    this.batchSize = opts.batchSize ?? 25; 
 
     if (opts.includeFile) {
       this.includeFile = opts.includeFile;
@@ -86,7 +88,7 @@ export class DirectoryIndexer {
       url,
     });
 
-    if (this.files.length >= this.parallelism) {
+    if (this.files.length >= this.batchSize) {
       await this.catalog.upsertDocuments(this.files);
       this.files = [];
     }
