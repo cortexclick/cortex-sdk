@@ -82,6 +82,12 @@ test(
     expect(content.version).toBe(0);
     expect(content.commands.length).toBe(1);
 
+    // check that prompt that is too large will fail gracefully without hitting the service
+    const hugePrompt = "p".repeat(32 * 1000 * 1000);
+    await expect(() =>
+      cortex.generateContent({ title, prompt: hugePrompt }),
+    ).rejects.toThrow("Request body too large");
+
     // get content
     const getContent = await testClient.getContent(content.id);
     expect(getContent.content.length).toBe(content.content.length);

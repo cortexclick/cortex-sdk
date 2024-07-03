@@ -41,14 +41,13 @@ export class CortexApiClient {
       },
       body: form,
     });
-    form.values.length;
   }
 
   private async makeRequest(method: Method, path: string, body?: any) {
     const requestBody = body ? JSON.stringify(body) : undefined;
     // Note that we use character size instead of byte size. This is still a useful heuristic as we don't want to incur the overhead
     // of using TextEncoder to calculate the precise byte count
-    if (requestBody && requestBody.length >= this.maxRequestSize) {
+    if (requestBody && requestBody.length > this.maxRequestSize) {
       throw new Error("Request body too large");
     }
 
@@ -65,6 +64,7 @@ export class CortexApiClient {
   private static getFormDataSize(formData: FormData) {
     return [...formData].reduce(
       (size, [_, value]) =>
+        // Use heuristic of string length instead of byte size, to avoid incurring the cost of using TextEncoder
         size + (typeof value === "string" ? value.length : value.size),
       0,
     );
