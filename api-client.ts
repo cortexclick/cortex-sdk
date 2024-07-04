@@ -4,6 +4,8 @@ type Method = "POST" | "GET" | "PUT" | "DELETE";
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
 export class CortexApiClient {
+  private readonly maxRequestSize = 32 * 1000 * 1000; // API is configured with max request body size of 32mb
+
   constructor(
     private org: string,
     private apiUrl: string,
@@ -27,6 +29,11 @@ export class CortexApiClient {
   }
 
   async POSTForm(path: string, form: FormData) {
+    const requestSize = CortexApiClient.getFormDataSize(form);
+    if (requestSize > this.maxRequestSize) {
+      throw new Error("Request body too large");
+    }
+
     return fetch(`${this.apiUrl}/org/${this.org}${path}`, {
       method: "POST",
       headers: {
@@ -37,13 +44,29 @@ export class CortexApiClient {
   }
 
   private async makeRequest(method: Method, path: string, body?: any) {
+    const requestBody = body ? JSON.stringify(body) : undefined;
+    // Note that we use character size instead of byte size. This is still a useful heuristic as we don't want to incur the overhead
+    // of using TextEncoder to calculate the precise byte count
+    if (requestBody && requestBody.length > this.maxRequestSize) {
+      throw new Error("Request body too large");
+    }
+
     return fetch(`${this.apiUrl}/org/${this.org}${path}`, {
       method,
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         "Content-Type": "application/json",
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: requestBody,
     });
+  }
+
+  private static getFormDataSize(formData: FormData) {
+    return [...formData].reduce(
+      (size, [_, value]) =>
+        // Use heuristic of string length instead of byte size, to avoid incurring the cost of using TextEncoder
+        size + (typeof value === "string" ? value.length : value.size),
+      0,
+    );
   }
 }
