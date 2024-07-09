@@ -90,6 +90,7 @@ export interface CortexCreateChatOptsBase {
   message: string;
   stream?: boolean;
   statusStream?: Readable;
+  externalUserId?: string;
 }
 
 export interface CortexCreateChatOptsStreaming
@@ -192,6 +193,7 @@ export class Cortex {
         message: opts.message,
         statusStream: opts.statusStream,
         stream: true,
+        externalUserId: opts.externalUserId,
       });
     } else {
       return Chat.create({
@@ -200,6 +202,7 @@ export class Cortex {
         message: opts.message,
         statusStream: opts.statusStream,
         stream: false,
+        externalUserId: opts.externalUserId,
       });
     }
   }

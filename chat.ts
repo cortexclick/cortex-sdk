@@ -9,6 +9,7 @@ export interface CreateChatOptsBase {
   message: string;
   stream?: boolean;
   statusStream?: Readable;
+  externalUserId?: string;
 }
 
 export interface CreateChatOptsStreaming extends CreateChatOptsBase {
@@ -46,6 +47,7 @@ export interface ChatListItem {
   userEmail?: string;
   cortexName: string;
   createdAt: string;
+  externalUserId?: string;
   Chat(): Promise<Chat>;
 }
 export interface ChatListResult {
@@ -56,6 +58,7 @@ export interface ChatListOpts {
   cursor?: string;
   pageSize?: number;
   userEmail?: string | null;
+  externalUserId?: string | null;
   cortexName?: string;
 }
 
@@ -72,6 +75,7 @@ export class Chat {
     readonly messages: Message[],
     readonly createdAt: string,
     readonly userEmail?: string,
+    readonly externalUserId?: string,
   ) {}
 
   static async create(opts: CreateChatOptsSync): Promise<Chat>;
@@ -91,8 +95,12 @@ export class Chat {
   private static async createContentSync(
     opts: CreateChatOptsSync,
   ): Promise<Chat> {
-    const { client, cortex, message } = opts;
-    const res = await client.POST(`/chats`, { cortex: cortex.name, message });
+    const { client, cortex, message, externalUserId } = opts;
+    const res = await client.POST(`/chats`, {
+      cortex: cortex.name,
+      message,
+      externalUserId,
+    });
     const body = await res.json();
     const messages: Message[] = [
       {
@@ -111,17 +119,19 @@ export class Chat {
       messages,
       body.createdAt,
       body.userEmail,
+      body.externalUserId,
     );
   }
 
   private static async createContentStreaming(
     opts: CreateChatOptsStreaming,
   ): Promise<StreamingChatResult> {
-    const { client, cortex, message } = opts;
+    const { client, cortex, message, externalUserId } = opts;
     const res = await client.POST(`/chats`, {
       cortex: cortex.name,
       message,
       stream: true,
+      externalUserId,
     });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
@@ -151,7 +161,15 @@ export class Chat {
           message: content,
         },
       ];
-      return new Chat(client, id, title, messages, createdAt, userEmail);
+      return new Chat(
+        client,
+        id,
+        title,
+        messages,
+        createdAt,
+        userEmail,
+        externalUserId,
+      );
     });
 
     return { responseStream: readableStream, chat: chatPromise };
@@ -170,6 +188,7 @@ export class Chat {
       body.messages,
       body.createdAt,
       body.userEmail,
+      body.externalUserId,
     );
   }
 
@@ -191,6 +210,9 @@ export class Chat {
     if (opts?.cortexName) {
       query.set("cortexName", opts.cortexName);
     }
+    if (opts?.externalUserId) {
+      query.set("externalUserId", opts.externalUserId);
+    }
     query.set("pageSize", (opts?.pageSize || 50).toString());
     const res = await client.GET(`/chats?${query.toString()}`);
     if (res.status !== 200) {
@@ -205,6 +227,7 @@ export class Chat {
         userEmail: chat.userEmail,
         cortexName: chat.cortexName,
         createdAt: chat.createdAt,
+        externalUserId: chat.externalUserId,
         Chat: () => {
           return Chat.get(client, chat.chatId);
         },
