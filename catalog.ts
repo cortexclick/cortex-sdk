@@ -128,6 +128,10 @@ export class Catalog {
   }
 
   public async upsertDocuments(batch: DocumentBatch) {
+    if (batch.length === 0) {
+      throw new Error("Document batch must not be empty");
+    }
+
     this.checkDeleted();
     let hasText = false;
     let hasFile = false;
