@@ -52,13 +52,14 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
 
   // create chat
   const chatInput = "what customers does cortex click have?";
-  const chat = await cortex.chat({ message: chatInput });
+  const chat = await cortex.chat({ message: chatInput, externalUserId: "123" });
   expect(chat.messages[1].message.length).toBeGreaterThan(0);
 
   // get chat
   const getChatRes = await testClient.getChat(chat.id);
   expect(getChatRes.messages.length).toBe(2);
   expect(getChatRes.title).toBe(chatInput);
+  expect(getChatRes.externalUserId).toBe("123");
 
   // respond to chat
   await chat.respond({ message: "what about customer verticals" });
@@ -131,6 +132,7 @@ test("streaming chat", { timeout: 60000 }, async () => {
     message: chatInput,
     stream: true,
     statusStream,
+    externalUserId: "123",
   });
 
   let fullMessage = "";
@@ -158,6 +160,7 @@ test("streaming chat", { timeout: 60000 }, async () => {
     chatResult.messages[chatResult.messages.length - 1].message,
   );
   expect(chatResult.messages.length).toBe(2);
+  expect(chatResult.externalUserId).toBe("123");
   expect(sawChat).toBe(true);
 
   // respond to chat
