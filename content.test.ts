@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { TextDocument } from "./index";
+import { ContentStatus, TextDocument } from "./index";
 import { CatalogConfig } from "./catalog";
 import { testClient } from "./vitest-test-client";
 import { Readable } from "stream";
@@ -8,21 +8,6 @@ test(
   "e2e catalog, cortex, and sync content generation workflow",
   { timeout: 180000 },
   async () => {
-    testClient.configureOrg({
-      companyName: "Cortex Click",
-      companyInfo:
-        "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
-      personality: [
-        "friendly and helpful",
-        "expert sales and marketing professional",
-        "experienced software developer",
-      ],
-      rules: [
-        "never say anything disparaging about AI or LLMs",
-        "do not offer discounts",
-      ],
-    });
-
     const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
     const config: CatalogConfig = {
@@ -81,6 +66,8 @@ test(
     expect(content.title).toBe(title);
     expect(content.version).toBe(0);
     expect(content.commands.length).toBe(1);
+    expect(content.status).toBe(ContentStatus.Draft);
+    expect(content.publishedVersion).toBe(undefined);
 
     // check that prompt that is too large will fail gracefully without hitting the service
     const hugePrompt = "p".repeat(32 * 1000 * 1000);
@@ -94,6 +81,8 @@ test(
     expect(getContent.title).toBe(title);
     expect(getContent.version).toBe(0);
     expect(getContent.commands.length).toBe(1);
+    expect(getContent.status).toBe(ContentStatus.Draft);
+    expect(getContent.publishedVersion).toBe(undefined);
 
     // edit content
     const editedContent = await content.edit({ title: "foo", content: "bar" });
@@ -101,6 +90,8 @@ test(
     expect(editedContent.title).toBe("foo");
     expect(editedContent.version).toBe(1);
     expect(editedContent.commands.length).toBe(2);
+    expect(editedContent.status).toBe(ContentStatus.Draft);
+    expect(editedContent.publishedVersion).toBe(undefined);
 
     // get content version
     const contentV0 = await testClient.getContent(content.id, 0);
@@ -108,6 +99,8 @@ test(
     expect(contentV0.title).toBe(originalTitle);
     expect(contentV0.version).toBe(0);
     expect(contentV0.commands.length).toBe(1);
+    expect(contentV0.status).toBe(ContentStatus.Draft);
+    expect(contentV0.publishedVersion).toBe(undefined);
 
     // revert to earlier version
     const revertedContent = await contentV0.revert(0);
@@ -115,6 +108,8 @@ test(
     expect(revertedContent.title).toBe(originalTitle);
     expect(revertedContent.version).toBe(2);
     expect(revertedContent.commands.length).toBe(3);
+    expect(revertedContent.status).toBe(ContentStatus.Draft);
+    expect(revertedContent.publishedVersion).toBe(undefined);
 
     const refinePrompt =
       "add a final paragraph with a joke or pun about cortex click an AI.";
@@ -126,19 +121,19 @@ test(
     expect(refinedContent.title).toBe(originalTitle);
     expect(refinedContent.version).toBe(3);
     expect(refinedContent.commands.length).toBe(4);
+    expect(refinedContent.status).toBe(ContentStatus.Draft);
+    expect(refinedContent.publishedVersion).toBe(undefined);
 
     // list content - putting test here to save overhead of generating more content
 
-    // disabling content list tests for now as there are a few bugs in the API
+    const contentList = await testClient.listContent({ pageSize: 1 });
+    expect(contentList.content.length).toBe(1);
 
-    // const contentList = await testClient.listContent({ pageSize: 1 });
-    // expect(contentList.content.length).toBe(1);
+    const nextPage = await contentList.nextPage();
+    expect(nextPage.content.length).toBe(1);
 
-    // const nextPage = await contentList.nextPage();
-    // expect(nextPage.content.length).toBe(1);
-
-    // const contentList2 = await testClient.listContent();
-    // expect(contentList2.content.length).toBeGreaterThan(1);
+    const contentList2 = await testClient.listContent();
+    expect(contentList2.content.length).toBeGreaterThan(1);
 
     // delete
     await catalog.delete();
@@ -146,21 +141,6 @@ test(
 );
 
 test("test streaming content", { timeout: 180000 }, async () => {
-  testClient.configureOrg({
-    companyName: "Cortex Click",
-    companyInfo:
-      "Cortex Click provides an AI platform for go-to-market. Cortex click allows you to index your enterprise knowledge base, and create agents called Cortexes that automate sales and marketing processes like SEO, content writing, RFP generation, customer support, sales document genearation such as security questionairres and more.",
-    personality: [
-      "friendly and helpful",
-      "expert sales and marketing professional",
-      "experienced software developer",
-    ],
-    rules: [
-      "never say anything disparaging about AI or LLMs",
-      "do not offer discounts",
-    ],
-  });
-
   const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
 
   const config: CatalogConfig = {
@@ -255,6 +235,8 @@ test("test streaming content", { timeout: 180000 }, async () => {
   expect(sawPlan).toBe(true);
   expect(sawDraft).toBe(true);
   expect(sawEditorial).toBe(true);
+  expect(contentResult.status).toBe(ContentStatus.Draft);
+  expect(contentResult.publishedVersion).toBe(undefined);
 
   const refinePrompt =
     "add a final paragraph with a joke or pun about cortex click an AI.";
@@ -274,6 +256,48 @@ test("test streaming content", { timeout: 180000 }, async () => {
   expect(refinedContent.title).toBe(title);
   expect(refinedContent.version).toBe(1);
   expect(refinedContent.commands.length).toBe(2);
+  expect(refinedContent.status).toBe(ContentStatus.Draft);
+  expect(refinedContent.publishedVersion).toBe(undefined);
 
   await catalog.delete();
+});
+
+test(`test content status and publishing`, { timeout: 180000 }, async () => {
+  const cortex = await testClient.configureCortex(
+    `cortex-${Math.floor(Math.random() * 10000)}`,
+    {
+      friendlyName: "Cortex AI",
+      instructions: ["answer questions about the cortex click AI GTM platform"],
+      public: true,
+    },
+  );
+
+  // create content
+  const title = "Overview of the Cortex Click AI GTM Platform";
+  const prompt =
+    "Write a blog post about the Cortex Click AI GTM Platform. Elaborate on scenarios, customers, and appropriate verticals. Make sure to mention the impact that AI can have on sales and marketing teams.";
+  const content = await cortex.generateContent({ title, prompt });
+
+  expect(content.status).toBe(ContentStatus.Draft);
+
+  await content.setStatus(ContentStatus.InReview);
+
+  expect(content.status).toBe(ContentStatus.InReview);
+
+  await content.setStatus(ContentStatus.Approved);
+
+  expect(content.status).toBe(ContentStatus.Approved);
+
+  await content.publish();
+
+  expect(content.status).toBe(ContentStatus.Published);
+  expect(content.publishedVersion).toBe(0);
+
+  await content.unpublish();
+  expect(content.status).toBe(ContentStatus.Draft);
+  expect(content.publishedVersion).toBe(undefined);
+
+  await content.publish();
+  expect(content.status).toBe(ContentStatus.Published);
+  expect(content.publishedVersion).toBe(0);
 });

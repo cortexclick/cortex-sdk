@@ -10,6 +10,15 @@ export type ContentCommandType =
   | "user-edit"
   | "revert";
 
+export const ContentStatus = {
+  Draft: "DRAFT" as const,
+  InReview: "IN_REVIEW" as const,
+  Approved: "APPROVED" as const,
+  Published: "PUBLISHED" as const,
+};
+export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus];
+export type SettableContentStatus = "DRAFT" | "IN_REVIEW" | "APPROVED";
+
 export interface CreateContentOptsBase {
   client: CortexApiClient;
   cortex: Cortex;
@@ -64,6 +73,8 @@ export type ContentListItem = {
   userEmail?: string;
   cortexName: string;
   createdAt: string;
+  status: ContentStatus;
+  publishedVersion?: number;
   Content(): Promise<Content>;
 };
 
@@ -111,6 +122,14 @@ export class Content {
     return this._createdAt;
   }
 
+  get status(): ContentStatus {
+    return this._status;
+  }
+
+  get publishedVersion(): number | undefined {
+    return this._publishedVersion;
+  }
+
   private constructor(
     private apiClient: CortexApiClient,
     private _id: string,
@@ -119,8 +138,10 @@ export class Content {
     private _commands: ContentCommand[],
     private _version: number,
     private _createdAt: string,
+    private _status: ContentStatus = "DRAFT",
     private _cortex?: string,
     private _userEmail?: string,
+    private _publishedVersion?: number,
   ) {}
 
   static async create(opts: CreateContentOptsSync): Promise<Content>;
@@ -157,8 +178,10 @@ export class Content {
       body.commands,
       body.version,
       body.createdAt,
+      body.status,
       body.cortex,
       body.userEmail,
+      numberOrUndefined(body.publishedVersion),
     );
   }
 
@@ -179,6 +202,10 @@ export class Content {
     const version: number = parseInt(res.headers.get("version") || "0");
     const userEmail = res.headers.get("userEmail") || undefined;
     const createdAt: string = res.headers.get("createdAt") || "";
+    const status: ContentStatus = res.headers.get("status") as ContentStatus;
+    const publishedVersion: number | undefined = numberOrUndefined(
+      res.headers.get("publishedVersion"),
+    );
     const commands: ContentCommand[] = JSON.parse(
       res.headers.get("commands") || "[]",
     );
@@ -201,8 +228,10 @@ export class Content {
         commands,
         version,
         createdAt,
+        status,
         cortex.name,
         userEmail,
+        publishedVersion,
       );
     });
 
@@ -234,8 +263,10 @@ export class Content {
       body.commands,
       body.version,
       body.createdAt,
+      body.status,
       body.cortex,
       body.userEmail,
+      numberOrUndefined(body.publishedVersion),
     );
   }
 
@@ -248,14 +279,7 @@ export class Content {
 
     const res = await this.apiClient.PUT(`/content/${this._id}`, opts);
     const body = await res.json();
-
-    this._commands = body.commands;
-    this._content = body.content;
-    this._title = body.title;
-    this._version = body.version;
-    this._cortex = body.cortex;
-    this._userEmail = body.userEmail;
-    this._createdAt = body.createdAt;
+    this.updateFromResponseBody(body);
 
     return this;
   }
@@ -281,14 +305,7 @@ export class Content {
       prompt: opts.prompt,
     });
     const body = await res.json();
-
-    this._commands = body.commands;
-    this._content = body.content;
-    this._title = body.title;
-    this._version = body.version;
-    this._cortex = body.cortex;
-    this._userEmail = body.userEmail;
-    this._createdAt = body.createdAt;
+    this.updateFromResponseBody(body);
 
     return this;
   }
@@ -310,10 +327,16 @@ export class Content {
     const commands: ContentCommand[] = JSON.parse(
       res.headers.get("commands") || "[]",
     );
+    const status = res.headers.get("status") as ContentStatus;
+    const publishedVersion: number | undefined = numberOrUndefined(
+      res.headers.get("publishedVersion"),
+    );
     this._version = version;
     this._commands = commands;
     this._createdAt = createdAt;
     this._userEmail = userEmail;
+    this._status = status;
+    this._publishedVersion = publishedVersion;
 
     const readableStream = new Readable({
       read() {},
@@ -342,16 +365,64 @@ export class Content {
     }
 
     const body = await res.json();
-
-    this._commands = body.commands;
-    this._content = body.content;
-    this._title = body.title;
-    this._version = body.version;
-    this._cortex = body.cortex;
-    this._userEmail = body.userEmail;
-    this._createdAt = body.createdAt;
+    this.updateFromResponseBody(body);
 
     return this;
+  }
+
+  async setStatus(status: SettableContentStatus) {
+    const res = await this.apiClient.PUT(`/content/${this._id}/status`, {
+      status,
+    });
+
+    if (res.status !== 200) {
+      throw new Error(`Failed to set content status: ${res.statusText}`);
+    }
+
+    const body = await res.json();
+    this.updateFromResponseBody(body);
+
+    return this;
+  }
+
+  async publish() {
+    const res = await this.apiClient.POST(`/content/${this._id}/publish`);
+
+    if (res.status !== 200) {
+      throw new Error(`Failed to publish content: ${res.statusText}`);
+    }
+
+    const body = await res.json();
+    this.updateFromResponseBody(body);
+
+    return this;
+  }
+
+  async unpublish() {
+    const res = await this.apiClient.POST(`/content/${this._id}/unpublish`);
+
+    if (res.status !== 200) {
+      throw new Error(`Failed to unpublish content: ${res.statusText}`);
+    }
+
+    const body = await res.json();
+    this.updateFromResponseBody(body);
+
+    return this;
+  }
+
+  private updateFromResponseBody(body: Record<string, unknown>) {
+    this._commands = body.commands as ContentCommand[];
+    this._content = body.content as string;
+    this._title = body.title as string;
+    this._version = body.version as number;
+    this._cortex = body.cortex as string;
+    this._userEmail = body.userEmail as string | undefined;
+    this._createdAt = body.createdAt as string;
+    this._publishedVersion = numberOrUndefined(
+      body.publishedVersion as string | undefined,
+    );
+    this._status = body.status as ContentStatus;
   }
 
   static async list(
@@ -386,6 +457,8 @@ export class Content {
         userEmail: content.userEmail,
         cortexName: content.cortexName,
         createdAt: content.createdAt,
+        status: content.status,
+        publishedVersion: numberOrUndefined(content.publishedVersion),
         Content: () => {
           return Content.get(client, content.contentId);
         },
@@ -411,4 +484,20 @@ function isRefineContentOptsSync(
   opts: RefineContentOptsSync | RefineContentOptsStreaming,
 ): opts is RefineContentOptsSync {
   return opts.stream === false || opts.stream === undefined;
+}
+
+// if a number (even 0), returns it
+// if a string, parses it as an int, unless its an empty string, in which case returns undefined
+// if undefined, returns undefined
+function numberOrUndefined(
+  val: number | string | undefined | null,
+): number | undefined {
+  switch (typeof val) {
+    case "number":
+      return val;
+    case "string":
+      return val === "" ? undefined : parseInt(val);
+    default:
+      return undefined;
+  }
 }
