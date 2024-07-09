@@ -81,7 +81,7 @@ export class ShopifyIndexer {
         }
 
         this.documents.push({
-          id: item.id,
+          id: item.id.toString(),
           title: item.title,
           description: this.stripHTML(item.body_html),
           productType: item.product_type,
