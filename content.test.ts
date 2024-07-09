@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { TextDocument } from "./index";
+import { ContentStatus, TextDocument } from "./index";
 import { CatalogConfig } from "./catalog";
 import { testClient } from "./vitest-test-client";
 import { Readable } from "stream";
@@ -81,7 +81,7 @@ test(
     expect(content.title).toBe(title);
     expect(content.version).toBe(0);
     expect(content.commands.length).toBe(1);
-    expect(content.status).toBe("DRAFT");
+    expect(content.status).toBe(ContentStatus.Draft);
     expect(content.publishedVersion).toBe(undefined);
 
     // get content
@@ -90,7 +90,7 @@ test(
     expect(getContent.title).toBe(title);
     expect(getContent.version).toBe(0);
     expect(getContent.commands.length).toBe(1);
-    expect(getContent.status).toBe("DRAFT");
+    expect(getContent.status).toBe(ContentStatus.Draft);
     expect(getContent.publishedVersion).toBe(undefined);
 
     // edit content
@@ -99,7 +99,7 @@ test(
     expect(editedContent.title).toBe("foo");
     expect(editedContent.version).toBe(1);
     expect(editedContent.commands.length).toBe(2);
-    expect(editedContent.status).toBe("DRAFT");
+    expect(editedContent.status).toBe(ContentStatus.Draft);
     expect(editedContent.publishedVersion).toBe(undefined);
 
     // get content version
@@ -108,7 +108,7 @@ test(
     expect(contentV0.title).toBe(originalTitle);
     expect(contentV0.version).toBe(0);
     expect(contentV0.commands.length).toBe(1);
-    expect(contentV0.status).toBe("DRAFT");
+    expect(contentV0.status).toBe(ContentStatus.Draft);
     expect(contentV0.publishedVersion).toBe(undefined);
 
     // revert to earlier version
@@ -117,7 +117,7 @@ test(
     expect(revertedContent.title).toBe(originalTitle);
     expect(revertedContent.version).toBe(2);
     expect(revertedContent.commands.length).toBe(3);
-    expect(revertedContent.status).toBe("DRAFT");
+    expect(revertedContent.status).toBe(ContentStatus.Draft);
     expect(revertedContent.publishedVersion).toBe(undefined);
 
     const refinePrompt =
@@ -130,7 +130,7 @@ test(
     expect(refinedContent.title).toBe(originalTitle);
     expect(refinedContent.version).toBe(3);
     expect(refinedContent.commands.length).toBe(4);
-    expect(refinedContent.status).toBe("DRAFT");
+    expect(refinedContent.status).toBe(ContentStatus.Draft);
     expect(refinedContent.publishedVersion).toBe(undefined);
 
     // list content - putting test here to save overhead of generating more content
@@ -259,7 +259,7 @@ test("test streaming content", { timeout: 180000 }, async () => {
   expect(sawPlan).toBe(true);
   expect(sawDraft).toBe(true);
   expect(sawEditorial).toBe(true);
-  expect(contentResult.status).toBe("DRAFT");
+  expect(contentResult.status).toBe(ContentStatus.Draft);
   expect(contentResult.publishedVersion).toBe(undefined);
 
   const refinePrompt =
@@ -280,7 +280,7 @@ test("test streaming content", { timeout: 180000 }, async () => {
   expect(refinedContent.title).toBe(title);
   expect(refinedContent.version).toBe(1);
   expect(refinedContent.commands.length).toBe(2);
-  expect(refinedContent.status).toBe("DRAFT");
+  expect(refinedContent.status).toBe(ContentStatus.Draft);
   expect(refinedContent.publishedVersion).toBe(undefined);
 
   await catalog.delete();
@@ -317,26 +317,26 @@ test(`test content status and publishing`, { timeout: 180000 }, async () => {
     "Write a blog post about the Cortex Click AI GTM Platform. Elaborate on scenarios, customers, and appropriate verticals. Make sure to mention the impact that AI can have on sales and marketing teams.";
   const content = await cortex.generateContent({ title, prompt });
 
-  expect(content.status).toBe("DRAFT");
+  expect(content.status).toBe(ContentStatus.Draft);
 
-  await content.setStatus("IN_REVIEW");
+  await content.setStatus(ContentStatus.InReview);
 
-  expect(content.status).toBe("IN_REVIEW");
+  expect(content.status).toBe(ContentStatus.InReview);
 
-  await content.setStatus("APPROVED");
+  await content.setStatus(ContentStatus.Approved);
 
-  expect(content.status).toBe("APPROVED");
+  expect(content.status).toBe(ContentStatus.Approved);
 
   await content.publish();
 
-  expect(content.status).toBe("PUBLISHED");
+  expect(content.status).toBe(ContentStatus.Published);
   expect(content.publishedVersion).toBe(0);
 
   await content.unpublish();
-  expect(content.status).toBe("DRAFT");
+  expect(content.status).toBe(ContentStatus.Draft);
   expect(content.publishedVersion).toBe(undefined);
 
   await content.publish();
-  expect(content.status).toBe("PUBLISHED");
+  expect(content.status).toBe(ContentStatus.Published);
   expect(content.publishedVersion).toBe(0);
 });

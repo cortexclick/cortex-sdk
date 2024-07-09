@@ -10,7 +10,13 @@ export type ContentCommandType =
   | "user-edit"
   | "revert";
 
-export type ContentStatus = "DRAFT" | "IN_REVIEW" | "APPROVED" | "PUBLISHED";
+export const ContentStatus = {
+  Draft: "DRAFT" as const,
+  InReview: "IN_REVIEW" as const,
+  Approved: "APPROVED" as const,
+  Published: "PUBLISHED" as const,
+};
+export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus];
 export type SettableContentStatus = "DRAFT" | "IN_REVIEW" | "APPROVED";
 
 export interface CreateContentOptsBase {
