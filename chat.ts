@@ -58,7 +58,7 @@ export interface ChatListOpts {
   cursor?: string;
   pageSize?: number;
   userEmail?: string | null;
-  externalUserId?: string | null;
+  externalUserId?: string;
   cortexName?: string;
 }
 
