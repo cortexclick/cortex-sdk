@@ -134,7 +134,7 @@ export class Cortex {
       overrides: {
         companyInfo: body.companyInfo,
         companyName: body.companyName,
-        inheritRules: !!body.inheritRules,
+        inheritRules: body.inheritRules === false ? false : true,
       },
     };
     return new Cortex(config, apiClient, name);
@@ -156,7 +156,7 @@ export class Cortex {
       examples: config.chatConfig?.examples,
       greeting: config.chatConfig?.greeting,
       intro: config.chatConfig?.intro,
-      inheritRules: !!config.overrides?.inheritRules,
+      inheritRules: config.overrides?.inheritRules === false ? false : true,
       public: !!config.public,
       instructions: config.instructions,
       personality: config.customizations?.personality,
