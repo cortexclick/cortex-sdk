@@ -55,7 +55,7 @@ test("can configure, get, and delete and Cortexes", async () => {
 
   cortex = await testClient.getCortex(cortexName);
   expect(cortex.config.catalogs).toStrictEqual(cortexConfig.catalogs);
-  expect(cortex.config.overrides?.inheritRules).toBe(true); // test input doesn't specify `inheritRules`, should be true by default 
+  expect(cortex.config.overrides?.inheritRules).toBe(true); // test input doesn't specify `inheritRules`, should be true by default
   // TODO - check all the properties
 
   // delete the cortex
