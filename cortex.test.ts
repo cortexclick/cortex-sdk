@@ -48,7 +48,6 @@ test("can configure, get, and delete and Cortexes", async () => {
     overrides: {
       companyInfo: "a very good company that does AI stuff",
       companyName: "Cortex Click, Inc. --test",
-      inheritRules: false,
     },
   };
 
@@ -56,11 +55,12 @@ test("can configure, get, and delete and Cortexes", async () => {
 
   cortex = await testClient.getCortex(cortexName);
   expect(cortex.config.catalogs).toStrictEqual(cortexConfig.catalogs);
+  expect(cortex.config.overrides?.inheritRules).toBe(true); // test input doesn't specify `inheritRules`, should be true by default 
   // TODO - check all the properties
 
   // delete the cortex
   await cortex.delete();
-  // assert that the get failes
+  // assert that the get fails
   await expect(async () => {
     await testClient.getCortex(cortexName);
   }).rejects.toThrowError("Failed to get cortex: Not Found");
