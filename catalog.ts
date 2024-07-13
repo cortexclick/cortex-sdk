@@ -136,6 +136,8 @@ export class Catalog {
     let hasText = false;
     let hasFile = false;
     let hasJson = false;
+    let hasUrl = false;
+    let hasSitemapUrl = false;
     for (const doc of batch) {
       switch (doc.contentType) {
         case "markdown":
@@ -148,6 +150,12 @@ export class Catalog {
         case "file":
           hasFile = true;
           break;
+        case "url":
+          hasUrl = true;
+          break;
+        case "sitemap-url":
+          hasSitemapUrl = true;
+          break;
         default:
           throw new Error(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -156,9 +164,12 @@ export class Catalog {
       }
     }
 
-    if ([hasText, hasJson, hasFile].filter((v) => v).length > 1) {
+    if (
+      [hasText, hasJson, hasFile, hasUrl, hasSitemapUrl].filter((v) => v)
+        .length > 1
+    ) {
       throw new Error(
-        `cannot mix file, text, and json content in batch upsert. all documents in batch must have the same contentType.`,
+        `cannot mix file, text, url, sitemap-url, json content in batch upsert. all documents in batch must have the same contentType.`,
       );
     }
 
@@ -181,7 +192,7 @@ export class Catalog {
       );
     }
 
-    if (res.status !== 200) {
+    if (res.status > 202) {
       throw new Error(`Failed to upsert documents: ${res.statusText}`);
     }
   }
@@ -276,6 +287,18 @@ const mapBatch = async (batch: DocumentBatch) => {
         documents.push({
           ...doc,
           content: undefined,
+        });
+        break;
+      case "url":
+        documents.push({
+          documentId: doc.url,
+          contentType: "url",
+        });
+        break;
+      case "sitemap-url":
+        documents.push({
+          documentId: doc.sitemapUrl,
+          contentType: "sitemap-url",
         });
         break;
       default:

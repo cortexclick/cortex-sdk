@@ -1,11 +1,28 @@
 import { CortexApiClient } from "./api-client.js";
 import { Catalog } from "./catalog.js";
 
+export type UrlContentType = "url";
+export type SitemapContentType = "sitemap-url";
 export type TextContentType = "text" | "markdown";
 export type JSONContentType = "json";
 export type FileContentType = "file";
 
-export type ContentType = FileContentType | TextContentType | JSONContentType;
+export type ContentType =
+  | FileContentType
+  | TextContentType
+  | JSONContentType
+  | UrlContentType
+  | SitemapContentType;
+
+export type UrlDocument = {
+  url: string;
+  contentType: UrlContentType;
+};
+
+export type SitemapDocument = {
+  sitemapUrl: string;
+  contentType: SitemapContentType;
+};
 
 export type JSONDocument = {
   documentId: string;
@@ -31,7 +48,12 @@ export type FileDocument = {
   imageUrl?: string;
 };
 
-export type DocumentBatch = TextDocument[] | JSONDocument[] | FileDocument[];
+export type DocumentBatch =
+  | TextDocument[]
+  | JSONDocument[]
+  | FileDocument[]
+  | UrlDocument[]
+  | SitemapDocument[];
 
 export type DocumentInput = {
   documentId: string;
