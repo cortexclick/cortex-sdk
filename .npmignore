@@ -6,3 +6,5 @@ test_data
 .eslint*
 .nvm*
 vitest*
+images
+.github

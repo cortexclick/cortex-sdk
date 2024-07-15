@@ -18,7 +18,7 @@
     "url": "https://github.com/cortexclick/cortex-sdk",
     "type": "git"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -34,7 +34,9 @@
     "test:prod": "pulumi env run npm-test npm run test",
     "test:fast:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test npm run test:fast",
     "test:fast:prod": "pulumi env run npm-test npm run test:fast",
-    "test:indexers:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test vitest indexers.test.ts"
+    "test:indexers:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test vitest indexers.test.ts",
+    "test:scraping:dev": "RUN_SCRAPER_TESTS=true CORTEX_API_URL=https://api-dev.cortexclick.com pulumi env run npm-test vitest scraping.test.ts",
+    "test:scraping:prod": "RUN_SCRAPER_TESTS=true CORTEX_API_URL=https://api.cortexclick.com pulumi env run npm-test vitest scraping.test.ts"
   },
   "keywords": [],
   "author": "",
