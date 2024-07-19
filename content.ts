@@ -194,6 +194,7 @@ export class Content {
       title,
       prompt,
       stream,
+      base64encodeContentHeaders: true,
     });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
@@ -207,7 +208,8 @@ export class Content {
       res.headers.get("publishedVersion"),
     );
     const commands: ContentCommand[] = JSON.parse(
-      res.headers.get("commands") || "[]",
+      Buffer.from(res.headers.get("commands") || "", "base64").toString() ||
+        "[]",
     );
 
     const readableStream = new Readable({
@@ -317,6 +319,7 @@ export class Content {
     const res = await this.apiClient.POST(`/content/${this._id}/refine`, {
       prompt,
       stream: true,
+      base64encodeContentHeaders: true,
     });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
@@ -325,8 +328,13 @@ export class Content {
     const createdAt = res.headers.get("createdAt") || "";
     const userEmail = res.headers.get("userEmail") || undefined;
     const commands: ContentCommand[] = JSON.parse(
-      res.headers.get("commands") || "[]",
+      Buffer.from(res.headers.get("commands") || "", "base64").toString() ||
+        "[]",
     );
+    const title = Buffer.from(
+      res.headers.get("title") || "",
+      "base64",
+    ).toString();
     const status = res.headers.get("status") as ContentStatus;
     const publishedVersion: number | undefined = numberOrUndefined(
       res.headers.get("publishedVersion"),
@@ -337,6 +345,7 @@ export class Content {
     this._userEmail = userEmail;
     this._status = status;
     this._publishedVersion = publishedVersion;
+    this._title = title;
 
     const readableStream = new Readable({
       read() {},
