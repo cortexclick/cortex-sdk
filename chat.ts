@@ -150,7 +150,7 @@ export class Chat {
       decoder,
       readableStream,
       opts.statusStream,
-    ).then((content) => {
+    ).then(([content]) => {
       const messages: Message[] = [
         {
           role: "user",
@@ -296,7 +296,7 @@ export class Chat {
       decoder,
       readableStream,
       opts.statusStream,
-    ).then((content) => {
+    ).then(([content]) => {
       this.messages.push(
         {
           role: "user",
