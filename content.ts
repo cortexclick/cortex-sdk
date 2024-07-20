@@ -89,6 +89,18 @@ export type ContentListOptions = {
   cortexName?: string;
 };
 
+export type ContentMetadata = {
+  id: string;
+  title: string;
+  version: number;
+  commands: ContentCommand[];
+  cortex: string;
+  createdAt: string;
+  userEmail: string;
+  status: ContentStatus;
+  publishedVersion: number | null;
+};
+
 export class Content {
   get id() {
     return this._id;
@@ -194,44 +206,37 @@ export class Content {
       title,
       prompt,
       stream,
+      noContentInHeaders: true,
     });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
-
-    const id: string = res.headers.get("id") || "";
-    const version: number = parseInt(res.headers.get("version") || "0");
-    const userEmail = res.headers.get("userEmail") || undefined;
-    const createdAt: string = res.headers.get("createdAt") || "";
-    const status: ContentStatus = res.headers.get("status") as ContentStatus;
-    const publishedVersion: number | undefined = numberOrUndefined(
-      res.headers.get("publishedVersion"),
-    );
-    const commands: ContentCommand[] = JSON.parse(
-      res.headers.get("commands") || "[]",
-    );
 
     const readableStream = new Readable({
       read() {},
     });
 
-    const contentPromise = processStream(
+    const contentPromise = processStream<ContentMetadata>(
       reader,
       decoder,
       readableStream,
       opts.statusStream,
-    ).then((content) => {
+    ).then(([content, metadata]) => {
+      if (!metadata) {
+        throw new Error("Metadata not found in stream");
+      }
+
       return new Content(
         client,
-        id,
-        title,
+        metadata.id,
+        metadata.title,
         content,
-        commands,
-        version,
-        createdAt,
-        status,
-        cortex.name,
-        userEmail,
-        publishedVersion,
+        metadata.commands,
+        metadata.version,
+        metadata.createdAt,
+        metadata.status,
+        metadata.cortex,
+        metadata.userEmail,
+        metadata.publishedVersion || undefined,
       );
     });
 
@@ -317,38 +322,33 @@ export class Content {
     const res = await this.apiClient.POST(`/content/${this._id}/refine`, {
       prompt,
       stream: true,
+      noContentInHeaders: true,
     });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
-
-    const version: number = parseInt(res.headers.get("version") || "0");
-    const createdAt = res.headers.get("createdAt") || "";
-    const userEmail = res.headers.get("userEmail") || undefined;
-    const commands: ContentCommand[] = JSON.parse(
-      res.headers.get("commands") || "[]",
-    );
-    const status = res.headers.get("status") as ContentStatus;
-    const publishedVersion: number | undefined = numberOrUndefined(
-      res.headers.get("publishedVersion"),
-    );
-    this._version = version;
-    this._commands = commands;
-    this._createdAt = createdAt;
-    this._userEmail = userEmail;
-    this._status = status;
-    this._publishedVersion = publishedVersion;
 
     const readableStream = new Readable({
       read() {},
     });
 
-    const contentPromise = processStream(
+    const contentPromise = processStream<ContentMetadata>(
       reader,
       decoder,
       readableStream,
       opts.statusStream,
-    ).then((content) => {
+    ).then(([content, metadata]) => {
+      if (!metadata) {
+        throw new Error("Metadata not found in stream");
+      }
+
       this._content = content;
+      this._version = metadata.version;
+      this._commands = metadata.commands;
+      this._createdAt = metadata.createdAt;
+      this._userEmail = metadata.userEmail;
+      this._status = metadata.status;
+      this._publishedVersion = metadata.publishedVersion || undefined;
+      this._title = metadata.title;
       return this;
     });
 

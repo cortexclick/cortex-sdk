@@ -1,14 +1,16 @@
 import { Readable } from "stream";
 
-export async function processStream(
+export async function processStream<Metadata extends Record<string, unknown>>(
   reader: ReadableStreamDefaultReader<Uint8Array>,
   decoder: TextDecoder,
   contentStream: Readable,
   statusStream?: Readable,
-): Promise<string> {
+): Promise<[string, Metadata | undefined]> {
   let buffer = "";
   let fullContent = "";
   let isStatusStreamOpen = true;
+
+  let metadata: Metadata | undefined = undefined;
 
   const processNextChunk = async (): Promise<void> => {
     const { done, value } = await reader.read();
@@ -43,6 +45,8 @@ export async function processStream(
           // t:s = status message
           else if (json.messageType === "status" && statusStream) {
             statusStream.push(line + "\n");
+          } else if (json.messageType === "metadata") {
+            metadata = json.data;
           }
         } catch (e) {
           console.error("Error parsing JSON:", e);
@@ -57,5 +61,5 @@ export async function processStream(
     contentStream.emit("error", error);
   });
 
-  return fullContent;
+  return [fullContent, metadata];
 }
