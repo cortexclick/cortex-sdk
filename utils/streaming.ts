@@ -46,7 +46,7 @@ export async function processStream<Metadata extends Record<string, unknown>>(
           else if (json.messageType === "status" && statusStream) {
             statusStream.push(line + "\n");
           } else if (json.messageType === "metadata") {
-            metadata = json.metadata;
+            metadata = json.data;
           }
         } catch (e) {
           console.error("Error parsing JSON:", e);
