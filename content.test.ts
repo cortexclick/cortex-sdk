@@ -284,18 +284,38 @@ test(`test content status and publishing`, { timeout: 180000 }, async () => {
 
   expect(content.status).toBe(ContentStatus.InReview);
 
+  const inReviewContent = await testClient.listContent({
+    status: ContentStatus.InReview,
+  });
+  expect(inReviewContent.content.length).toBe(0);
+
   await content.setStatus(ContentStatus.Approved);
 
   expect(content.status).toBe(ContentStatus.Approved);
+
+  const approvedContent = await testClient.listContent({
+    status: ContentStatus.Approved,
+  });
+  expect(approvedContent.content.length).toBe(1);
 
   await content.publish();
 
   expect(content.status).toBe(ContentStatus.Published);
   expect(content.publishedVersion).toBe(0);
 
+  const publishedContent = await testClient.listContent({
+    status: ContentStatus.Published,
+  });
+  expect(publishedContent.content.length).toBe(1);
+
   await content.unpublish();
   expect(content.status).toBe(ContentStatus.Draft);
   expect(content.publishedVersion).toBe(undefined);
+
+  const publishedContent2 = await testClient.listContent({
+    status: ContentStatus.Published,
+  });
+  expect(publishedContent2.content.length).toBe(0);
 
   await content.publish();
   expect(content.status).toBe(ContentStatus.Published);
