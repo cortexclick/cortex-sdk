@@ -87,6 +87,7 @@ export type ContentListOptions = {
   pageSize?: number;
   userEmail?: string | null;
   cortexName?: string;
+  status?: ContentStatus;
 };
 
 export type ContentMetadata = {
@@ -442,6 +443,9 @@ export class Content {
     }
     if (opts?.cortexName) {
       query.set("cortexName", opts.cortexName);
+    }
+    if (opts?.status) {
+      query.set("status", opts.status);
     }
     query.set("pageSize", (opts?.pageSize || 50).toString());
     const res = await client.GET(`/content?${query.toString()}`);

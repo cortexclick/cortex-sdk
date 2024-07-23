@@ -3,7 +3,7 @@ import { Catalog, CatalogConfig } from "./catalog.js";
 import { OrgConfigOpts, OrgConfig } from "./org.js";
 import { CortexApiClient } from "./api-client.js";
 import { Chat, StreamingChatResult } from "./chat.js";
-import { Content, StreamingContentResult } from "./content.js";
+import { Content, ContentStatus, StreamingContentResult } from "./content.js";
 import { Readable } from "stream";
 
 export type CortexClientArgs = {
@@ -49,6 +49,7 @@ export interface ClientListContentOpts {
   cursor?: string;
   userEmail?: string | null;
   cortexName?: string;
+  status?: ContentStatus;
 }
 export interface ClientListChatOpts {
   pageSize?: number;
