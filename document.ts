@@ -1,5 +1,5 @@
-import { CortexApiClient } from "./api-client.js";
-import { Catalog } from "./catalog.js";
+import { CortexApiClient } from "./api-client";
+import { Catalog } from "./catalog";
 
 export type UrlContentType = "url";
 export type SitemapContentType = "sitemap-url";

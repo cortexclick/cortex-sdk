@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
-import { Catalog } from "../catalog.js";
-import { FileDocument } from "../document.js";
+import { Catalog } from "../catalog";
+import { FileDocument } from "../document";
 
 export type DirectoryIndexerOpts = {
   rootDir: string;

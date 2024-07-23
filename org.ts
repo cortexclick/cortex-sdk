@@ -1,4 +1,4 @@
-import { CortexApiClient } from "./api-client.js";
+import { CortexApiClient } from "./api-client";
 
 export type OrgConfigOpts = {
   companyName: string;
