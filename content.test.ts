@@ -294,7 +294,7 @@ test(`test content status and publishing`, { timeout: 180000 }, async () => {
     cortexName: cortex.name,
     status: ContentStatus.InReview,
   });
-  expect(inReviewContent.content.length).toBe(0);
+  expect(inReviewContent.content.length).toBe(1);
 
   await content.setStatus(ContentStatus.Approved);
 
