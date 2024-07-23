@@ -286,6 +286,10 @@ test(`test content status and publishing`, { timeout: 180000 }, async () => {
   });
   expect(draftContent.content.length).toBe(1);
 
+  // next page should be empty. This tests that filters are passed through
+  const nextPage = await draftContent.nextPage();
+  expect(nextPage.content.length).toBe(0);
+
   await content.setStatus(ContentStatus.InReview);
 
   expect(content.status).toBe(ContentStatus.InReview);
