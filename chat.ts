@@ -234,11 +234,10 @@ export class Chat {
       });
     }
 
-    const cursor = body.cursor;
-    const pageSize = opts?.pageSize;
+    const newCursor = body.cursor;
     return {
       chats,
-      nextPage: async () => Chat.list(client, { cursor, pageSize }),
+      nextPage: async () => Chat.list(client, { ...opts, cursor: newCursor }),
     };
   }
 

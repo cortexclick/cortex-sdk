@@ -463,17 +463,15 @@ export class Content {
         createdAt: content.createdAt,
         status: content.status,
         publishedVersion: numberOrUndefined(content.publishedVersion),
-        Content: () => {
-          return Content.get(client, content.contentId);
-        },
+        Content: () => Content.get(client, content.contentId),
       });
     }
 
-    const cursor = body.cursor;
-    const pageSize = opts?.pageSize;
+    const newCursor = body.cursor;
     return {
       content: contentList,
-      nextPage: async () => Content.list(client, { cursor, pageSize }),
+      nextPage: async () =>
+        Content.list(client, { ...opts, cursor: newCursor }),
     };
   }
 }

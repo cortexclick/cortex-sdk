@@ -66,12 +66,24 @@ test("e2e catalog, cortex, and sync chat", { timeout: 60000 }, async () => {
   expect(chat.messages.length).toBe(4);
 
   // list chats
-  const chatList = await testClient.listChats({ pageSize: 1 });
+  const chatList = await testClient.listChats({
+    pageSize: 1,
+  });
   expect(chatList.chats.length).toBe(1);
 
   const nextPage = await chatList.nextPage();
   expect(nextPage.chats.length).toBe(1);
   expect(nextPage.chats[0].id).not.toBe(chatList.chats[0].id);
+
+  // test that filter gets passed through to nextPage
+  const chatList2 = await testClient.listChats({
+    pageSize: 1,
+    cortexName: cortex.name,
+  });
+  expect(chatList2.chats.length).toBe(1);
+  expect(chatList2.chats[0].cortexName).toBe(cortex.name);
+  const nextPage2 = await chatList2.nextPage();
+  expect(nextPage2.chats.length).toBe(0);
 
   // delete
   await catalog.delete();
