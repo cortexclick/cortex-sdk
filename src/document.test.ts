@@ -96,14 +96,14 @@ test(
       {
         documentId: "1",
         contentType: "file",
-        filePath: "./test_data/large_markdown_with_code.mdx",
+        filePath: "./src/test_data/large_markdown_with_code.mdx",
         url: "https://foo.com",
         imageUrl: "https://foo.com/image.jpg",
       },
       {
         documentId: "2",
         contentType: "file",
-        filePath: "./test_data/test_large_docx_file.docx",
+        filePath: "./src/test_data/test_large_docx_file.docx",
         url: "https://foo.com/2",
         imageUrl: "https://foo.com/image2.jpg",
       },

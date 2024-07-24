@@ -83,7 +83,7 @@ test(
 
 test("Test catalog.directoryIndexer", { timeout: 20000 }, async () => {
   const indexer = catalog.directoryIndexer({
-    rootDir: "./test_data",
+    rootDir: "./src/test_data",
   });
 
   await indexer.index();
@@ -96,7 +96,7 @@ test(
   "Test catalog.tsvIndexer with default opts",
   { timeout: 20000 },
   async () => {
-    const indexer = catalog.tsvIndexer("./test_data/test.tsv");
+    const indexer = catalog.tsvIndexer("./src/test_data/test.tsv");
 
     await indexer.index();
 
@@ -109,7 +109,7 @@ test(
   "Test catalog.tsvIndexer with custom opts",
   { timeout: 20000 },
   async () => {
-    const indexer = catalog.tsvIndexer("./test_data/test.tsv", {
+    const indexer = catalog.tsvIndexer("./src/test_data/test.tsv", {
       getId: (doc) => doc.id,
     });
 
