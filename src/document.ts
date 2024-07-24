@@ -79,7 +79,6 @@ export class Document {
     catalog: Catalog,
     documentId: string,
   ): Promise<Document> {
-    encodeURIComponent;
     const res = await apiClient.GET(
       `/catalogs/${catalog.name}/documents/${encodeURIComponent(documentId)}`,
     );
