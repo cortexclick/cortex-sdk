@@ -1,22 +1,19 @@
-import { CortexApiClient } from "./api-client.js";
+import { CortexApiClient } from "./api-client";
 import {
   DocumentBatch,
   DocumentInput,
   FileDocument,
   Document,
   DocumentListItem,
-} from "./document.js";
+} from "./document";
 import * as fs from "node:fs";
-import { JSONIndexer, JSONIndexerOpts } from "./indexers/json-indexer.js";
+import { JSONIndexer, JSONIndexerOpts } from "./indexers/json-indexer";
 import {
   DirectoryIndexer,
   DirectoryIndexerOpts,
-} from "./indexers/directory-indexer.js";
-import { TSVIndexer, TSVIndexerOpts } from "./indexers/tsv-indexer.js";
-import {
-  ShopifyIndexer,
-  ShopifyIndexerOpts,
-} from "./indexers/shopify-indexer.js";
+} from "./indexers/directory-indexer";
+import { TSVIndexer, TSVIndexerOpts } from "./indexers/tsv-indexer";
+import { ShopifyIndexer, ShopifyIndexerOpts } from "./indexers/shopify-indexer";
 
 export type CatalogConfig = {
   description: string;

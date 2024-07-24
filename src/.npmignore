@@ -1,0 +1,4 @@
+**/*.test.ts
+test_data/
+vitest-test-client.ts
+test-setup.ts

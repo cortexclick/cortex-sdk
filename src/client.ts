@@ -1,9 +1,9 @@
-import { Cortex, CortexConfig } from "./cortex.js";
-import { Catalog, CatalogConfig } from "./catalog.js";
-import { OrgConfigOpts, OrgConfig } from "./org.js";
-import { CortexApiClient } from "./api-client.js";
-import { Chat, StreamingChatResult } from "./chat.js";
-import { Content, ContentStatus, StreamingContentResult } from "./content.js";
+import { Cortex, CortexConfig } from "./cortex";
+import { Catalog, CatalogConfig } from "./catalog";
+import { OrgConfigOpts, OrgConfig } from "./org";
+import { CortexApiClient } from "./api-client";
+import { Chat, StreamingChatResult } from "./chat";
+import { Content, ContentStatus, StreamingContentResult } from "./content";
 import { Readable } from "stream";
 
 export type CortexClientArgs = {

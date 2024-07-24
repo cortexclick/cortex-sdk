@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
-import { Catalog } from "../catalog.js";
-import { JSONIndexer } from "./json-indexer.js";
+import { Catalog } from "../catalog";
+import { JSONIndexer } from "./json-indexer";
 
 // intentionally operates on any type
 /* eslint-disable  @typescript-eslint/no-explicit-any */

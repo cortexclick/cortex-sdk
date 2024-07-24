@@ -1,7 +1,7 @@
 import { Readable } from "stream";
-import { CortexApiClient } from "./api-client.js";
-import { Chat, StreamingChatResult } from "./chat.js";
-import { Content, StreamingContentResult } from "./content.js";
+import { CortexApiClient } from "./api-client";
+import { Chat, StreamingChatResult } from "./chat";
+import { Content, StreamingContentResult } from "./content";
 
 export type CortexConfig = {
   /**

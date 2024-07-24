@@ -1,7 +1,7 @@
-import { Cortex } from "./cortex.js";
-import { CortexApiClient } from "./api-client.js";
+import { Cortex } from "./cortex";
+import { CortexApiClient } from "./api-client";
 import { Readable } from "stream";
-import { processStream } from "./utils/streaming.js";
+import { processStream } from "./utils/streaming";
 
 export interface CreateChatOptsBase {
   client: CortexApiClient;

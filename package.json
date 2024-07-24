@@ -9,6 +9,7 @@
     "globals": "^15.6.0",
     "prettier": "3.3.2",
     "ts-node": "^10.9.2",
+    "tsup": "^8.2.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.13.1",
     "vitest": "^1.6.0"
@@ -18,17 +19,25 @@
     "url": "https://github.com/cortexclick/cortex-sdk",
     "type": "git"
   },
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
+    "clean": "rm -rf dist",
     "lint": "prettier --list-different . && eslint . --ext .ts || exit 1",
     "lint-fix": "prettier --write . && eslint . --ext .ts --fix",
     "dev": "node --watch -r ts-node/register index.ts",
     "run": "npm run build && node index.js",
     "test": "vitest",
-    "test:fast": "vitest run --exclude content.test.ts",
+    "test:package:dev": "npm run build && pulumi env run npm-test node ./test-package.js",
+    "test:package:ci": "npm run build && node ./test-package.js",
+    "test:fast": "vitest run --exclude src/content.test.ts",
     "test:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test npm run test",
     "test:ci": "vitest run",
     "test:prod": "pulumi env run npm-test npm run test",

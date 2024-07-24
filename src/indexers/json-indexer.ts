@@ -1,5 +1,5 @@
-import { Catalog } from "../catalog.js";
-import { JSONDocument } from "../document.js";
+import { Catalog } from "../catalog";
+import { JSONDocument } from "../document";
 
 // intentionally operates on any type
 /* eslint-disable  @typescript-eslint/no-explicit-any */
