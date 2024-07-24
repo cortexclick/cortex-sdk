@@ -68,3 +68,25 @@ jobs:
           CORTEX_ORG: ${{ secrets.CORTEX_ORG }}
           CORTEX_ACCESS_TOKEN: ${{ secrets.CORTEX_ACCESS_TOKEN }}
         run: npm run test:ci
+  test-package:
+    name: test-package
+    runs-on: ubuntu-latest
+    if: github.repository == 'cortexclick/cortex-sdk'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test that the package can be instantiated from the built files
+        env:
+          CORTEX_ORG: ${{ secrets.CORTEX_ORG }}
+          CORTEX_ACCESS_TOKEN: ${{ secrets.CORTEX_ACCESS_TOKEN }}
+        run: npm run test:package

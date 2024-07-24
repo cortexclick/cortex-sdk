@@ -34,6 +34,7 @@
     "dev": "node --watch -r ts-node/register index.ts",
     "run": "npm run build && node index.js",
     "test": "vitest",
+    "test:package": "npm run build && pulumi env run npm-test node ./test-package.js",
     "test:fast": "vitest run --exclude content.test.ts",
     "test:dev": "CORTEX_API_URL=http://localhost:3001 pulumi env run npm-test npm run test",
     "test:ci": "vitest run",
