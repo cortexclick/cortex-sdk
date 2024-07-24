@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { CatalogConfig } from "./catalog";
 import { SitemapDocument, UrlDocument } from "./document";
-import { testClient } from "./vitest-test-client";
+import { testClient } from "./src/vitest-test-client";
 
 const runScraperTests = process.env.RUN_SCRAPER_TESTS === "true";
 
