@@ -9,6 +9,7 @@
     "globals": "^15.6.0",
     "prettier": "3.3.2",
     "ts-node": "^10.9.2",
+    "tsup": "^8.2.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.13.1",
     "vitest": "^1.6.0"
@@ -20,9 +21,14 @@
   },
   "version": "0.0.7",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "lint": "prettier --list-different . && eslint . --ext .ts || exit 1",
     "lint-fix": "prettier --write . && eslint . --ext .ts --fix",
     "dev": "node --watch -r ts-node/register index.ts",
