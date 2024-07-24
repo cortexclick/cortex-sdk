@@ -22,7 +22,6 @@
   "version": "0.0.7",
   "type": "module",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
@@ -30,6 +29,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "clean": "rm -rf dist",
     "lint": "prettier --list-different . && eslint . --ext .ts || exit 1",
     "lint-fix": "prettier --write . && eslint . --ext .ts --fix",
     "dev": "node --watch -r ts-node/register index.ts",
