@@ -39,6 +39,8 @@ export type DocumentPaginationOpts = {
 
 export type CreateCatalogConfig = CatalogConfig & { catalogName: string };
 
+export type UpsertDocumentsResult = { warnings: string[] };
+
 export class Catalog {
   private deleted = false;
   private constructor(
@@ -124,7 +126,9 @@ export class Catalog {
     }
   }
 
-  public async upsertDocuments(batch: DocumentBatch) {
+  public async upsertDocuments(
+    batch: DocumentBatch,
+  ): Promise<UpsertDocumentsResult> {
     if (batch.length === 0) {
       throw new Error("Document batch must not be empty");
     }
@@ -136,7 +140,8 @@ export class Catalog {
     let hasUrl = false;
     let hasSitemapUrl = false;
     for (const doc of batch) {
-      switch (doc.contentType) {
+      const contentType = doc.contentType;
+      switch (contentType) {
         case "markdown":
         case "text":
           hasText = true;
@@ -154,10 +159,7 @@ export class Catalog {
           hasSitemapUrl = true;
           break;
         default:
-          throw new Error(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            `unsupported content type: ${(doc as any).contentType}`,
-          );
+          throw new Error(`unsupported content type: ${contentType}`);
       }
     }
 
@@ -192,6 +194,10 @@ export class Catalog {
     if (res.status > 202) {
       throw new Error(`Failed to upsert documents: ${res.statusText}`);
     }
+
+    const body = await res.json();
+
+    return { warnings: body?.warnings ?? [] };
   }
 
   async delete() {
