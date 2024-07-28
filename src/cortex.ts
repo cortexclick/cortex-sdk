@@ -111,7 +111,7 @@ export class Cortex {
   ) {}
 
   static async get(apiClient: CortexApiClient, name: string): Promise<Cortex> {
-    const res = await apiClient.GET(`/cortex-config/${name}`);
+    const res = await apiClient.GET(`/cortexes/${name}`);
     if (res.status !== 200) {
       throw new Error(`Failed to get cortex: ${res.statusText}`);
     }
@@ -162,12 +162,12 @@ export class Cortex {
       personality: config.customizations?.personality,
       rules: config.customizations?.rules,
     };
-    const getRes = await apiClient.GET(`/cortex-config/${name}`);
+    const getRes = await apiClient.GET(`/cortexes/${name}`);
     let res: Response;
     if (getRes.status !== 200) {
-      res = await apiClient.POST("/cortex-config", input);
+      res = await apiClient.POST("/cortexes", input);
     } else {
-      res = await apiClient.PUT(`/cortex-config/${name}`, input);
+      res = await apiClient.PUT(`/cortexes/${name}`, input);
     }
 
     if (res.status !== 200) {
@@ -179,7 +179,7 @@ export class Cortex {
   async delete() {
     this.checkDeleted();
     this.deleted = true;
-    await this.apiClient.DELETE(`/cortex-config/${this.name}`);
+    await this.apiClient.DELETE(`/cortexes/${this.name}`);
     return;
   }
 
