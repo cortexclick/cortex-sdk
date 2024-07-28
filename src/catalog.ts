@@ -139,7 +139,7 @@ export class Catalog {
     let hasJson = false;
     let hasUrl = false;
     let hasSitemapUrl = false;
-    for (const doc of batch) {
+    for (const [index, doc] of batch.entries()) {
       const contentType = doc.contentType;
       switch (contentType) {
         case "markdown":
@@ -159,7 +159,9 @@ export class Catalog {
           hasSitemapUrl = true;
           break;
         default:
-          throw new Error(`unsupported content type: ${contentType}`);
+          throw new Error(
+            `Unsupported content type: ${contentType} for document at index ${index}`,
+          );
       }
     }
 
