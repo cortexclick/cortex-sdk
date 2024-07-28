@@ -103,7 +103,7 @@ export class Document {
     const res = await this.apiClient.DELETE(
       `/catalogs/${this.catalog.name}/documents/${encodeURIComponent(this.documentId)}`,
     );
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to delete document: ${res.statusText}`);
     }
   }

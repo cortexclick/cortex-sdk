@@ -170,7 +170,7 @@ export class Cortex {
       res = await apiClient.PUT(`/cortexes/${name}`, input);
     }
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to configure cortex: ${res.statusText}`);
     }
     return new Cortex(config, apiClient, name);

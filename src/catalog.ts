@@ -51,7 +51,7 @@ export class Catalog {
 
   static async get(apiClient: CortexApiClient, name: string): Promise<Catalog> {
     const res = await apiClient.GET(`/catalogs/${name}`);
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to get catalog: ${res.statusText}`);
     }
     const body = await res.json();
@@ -79,7 +79,7 @@ export class Catalog {
       res = await apiClient.PUT(`/catalogs/${name}`, config);
     }
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to configure catalog: ${res.statusText}`);
     }
     return new Catalog(config, apiClient, name);
@@ -121,7 +121,7 @@ export class Catalog {
   public async truncate() {
     this.checkDeleted();
     const res = await this.apiClient.POST(`/catalogs/${this.name}/truncate`);
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to get catalog: ${res.statusText}`);
     }
   }

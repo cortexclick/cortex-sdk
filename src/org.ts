@@ -58,7 +58,7 @@ export class OrgConfig {
       res = await client.PUT("/org-config", config);
     }
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to configure org: ${res.statusText}`);
     }
 
