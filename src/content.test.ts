@@ -331,9 +331,16 @@ test(`test content status and publishing`, { timeout: 180000 }, async () => {
   });
   expect(publishedContent2.content.length).toBe(0);
 
-  await content.publish();
+  const publishTargets = await content.getPublishTargets();
+  expect(publishTargets.length).toBe(0);
+
+  await content.publish({ id: "none", type: "none" });
   expect(content.status).toBe(ContentStatus.Published);
   expect(content.publishedVersion).toBe(0);
+
+  await content.unpublish();
+  expect(content.status).toBe(ContentStatus.Draft);
+  expect(content.publishedVersion).toBe(undefined);
 
   await cortex.delete();
 });
