@@ -102,6 +102,21 @@ export type ContentMetadata = {
   publishedVersion: number | null;
 };
 
+export type ContentPublishTarget = {
+  id: string;
+  name: string;
+  type: "github_repo";
+};
+
+export type ContentFulfilledPublishTarget =
+  | {
+      id: string;
+      name: string;
+      type: "github_repo";
+      path: string;
+    }
+  | { id: "none"; type: "none" };
+
 export class Content {
   get id() {
     return this._id;
@@ -386,8 +401,12 @@ export class Content {
     return this;
   }
 
-  async publish() {
-    const res = await this.apiClient.POST(`/content/${this._id}/publish`);
+  async publish(
+    publishTarget: ContentFulfilledPublishTarget = { id: "none", type: "none" },
+  ) {
+    const res = await this.apiClient.POST(`/content/${this._id}/publish`, {
+      publishTarget,
+    });
 
     if (res.status !== 200) {
       throw new Error(`Failed to publish content: ${res.statusText}`);
@@ -410,6 +429,21 @@ export class Content {
     this.updateFromResponseBody(body);
 
     return this;
+  }
+
+  async getPublishTargets() {
+    const res = await this.apiClient.GET(
+      `/content/${this._id}/publish-targets`,
+    );
+
+    if (res.status !== 200) {
+      throw new Error(
+        `Failed to get content publish targets: ${res.statusText}`,
+      );
+    }
+
+    const result = (await res.json()) as { targets: ContentPublishTarget[] };
+    return result.targets;
   }
 
   private updateFromResponseBody(body: Record<string, unknown>) {
