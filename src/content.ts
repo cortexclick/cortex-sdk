@@ -376,7 +376,7 @@ export class Content {
       `/content/${this._id}/version/${version}`,
     );
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to revert content: ${res.statusText}`);
     }
 
@@ -391,7 +391,7 @@ export class Content {
       status,
     });
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to set content status: ${res.statusText}`);
     }
 
@@ -408,7 +408,7 @@ export class Content {
       publishTarget,
     });
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to publish content: ${res.statusText}`);
     }
 
@@ -421,7 +421,7 @@ export class Content {
   async unpublish() {
     const res = await this.apiClient.POST(`/content/${this._id}/unpublish`);
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to unpublish content: ${res.statusText}`);
     }
 

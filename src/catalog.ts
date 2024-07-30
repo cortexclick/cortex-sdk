@@ -39,6 +39,8 @@ export type DocumentPaginationOpts = {
 
 export type CreateCatalogConfig = CatalogConfig & { catalogName: string };
 
+export type UpsertDocumentsResult = { warnings: string[] };
+
 export class Catalog {
   private deleted = false;
   private constructor(
@@ -49,7 +51,7 @@ export class Catalog {
 
   static async get(apiClient: CortexApiClient, name: string): Promise<Catalog> {
     const res = await apiClient.GET(`/catalogs/${name}`);
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to get catalog: ${res.statusText}`);
     }
     const body = await res.json();
@@ -77,7 +79,7 @@ export class Catalog {
       res = await apiClient.PUT(`/catalogs/${name}`, config);
     }
 
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to configure catalog: ${res.statusText}`);
     }
     return new Catalog(config, apiClient, name);
@@ -119,12 +121,14 @@ export class Catalog {
   public async truncate() {
     this.checkDeleted();
     const res = await this.apiClient.POST(`/catalogs/${this.name}/truncate`);
-    if (res.status !== 200) {
+    if (res.status > 201) {
       throw new Error(`Failed to get catalog: ${res.statusText}`);
     }
   }
 
-  public async upsertDocuments(batch: DocumentBatch) {
+  public async upsertDocuments(
+    batch: DocumentBatch,
+  ): Promise<UpsertDocumentsResult> {
     if (batch.length === 0) {
       throw new Error("Document batch must not be empty");
     }
@@ -135,8 +139,9 @@ export class Catalog {
     let hasJson = false;
     let hasUrl = false;
     let hasSitemapUrl = false;
-    for (const doc of batch) {
-      switch (doc.contentType) {
+    for (const [index, doc] of batch.entries()) {
+      const contentType = doc.contentType;
+      switch (contentType) {
         case "markdown":
         case "text":
           hasText = true;
@@ -155,8 +160,7 @@ export class Catalog {
           break;
         default:
           throw new Error(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            `unsupported content type: ${(doc as any).contentType}`,
+            `Unsupported content type: ${contentType} for document at index ${index}`,
           );
       }
     }
@@ -192,6 +196,10 @@ export class Catalog {
     if (res.status > 202) {
       throw new Error(`Failed to upsert documents: ${res.statusText}`);
     }
+
+    const body = await res.json();
+
+    return { warnings: body?.warnings ?? [] };
   }
 
   async delete() {
