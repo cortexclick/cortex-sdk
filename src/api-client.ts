@@ -40,7 +40,7 @@ export class CortexApiClient {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
-        "User-Agent": `cortex-js-sdk-v${version}`,
+        "User-Agent": `cortex-js-sdk/${version}`,
       },
       body: form,
     });
