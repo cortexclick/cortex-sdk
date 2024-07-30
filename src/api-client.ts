@@ -1,3 +1,5 @@
+import { version } from "../package.json";
+
 type Method = "POST" | "GET" | "PUT" | "DELETE";
 
 // body can be any object
@@ -38,6 +40,7 @@ export class CortexApiClient {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
+        "User-Agent": `cortex-js-sdk/${version}`,
       },
       body: form,
     });
@@ -56,6 +59,7 @@ export class CortexApiClient {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         "Content-Type": "application/json",
+        "User-Agent": `cortex-js-sdk-v${version}`,
       },
       body: requestBody,
     });
