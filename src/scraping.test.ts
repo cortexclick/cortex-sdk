@@ -7,11 +7,17 @@ const runScraperTests = process.env.RUN_SCRAPER_TESTS === "true";
 
 const expectedSitemapUrls = 28;
 
+function getRandomCatalogName(): string {
+  // return a random name with a recongizable prefix and timestamp (so it's reasy to clean up leaks and identify problematic tests)
+  // Still use a random part because toISOString() only has millisecond resolution
+  return `sdk-scraper-test-${new Date().toISOString().replace(/[.:]/g, "-")}-${Math.floor(Math.random() * 1000)}`;
+}
+
 test.skipIf(!runScraperTests)(
   "Test scraping single URL",
   { timeout: 60000 },
   async () => {
-    const catalogName = `catalog-${Math.floor(Math.random() * 1000000)}`;
+    const catalogName = getRandomCatalogName();
 
     const config: CatalogConfig = {
       description: "foo bar",
@@ -52,7 +58,7 @@ test.skipIf(!runScraperTests)(
   "Test scraping sitemap",
   { timeout: 120000 },
   async () => {
-    const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+    const catalogName = getRandomCatalogName();
 
     const config: CatalogConfig = {
       description: "foo bar",
@@ -90,9 +96,9 @@ test.skipIf(!runScraperTests)(
   "Test isolation of scraping multiple catalogs at once",
   { timeout: 120000 },
   async () => {
-    const catalogName1 = `catalog-${Math.floor(Math.random() * 1000000)}`;
-    const catalogName2 = `catalog-${Math.floor(Math.random() * 1000000)}`;
-    const catalogName3 = `catalog-${Math.floor(Math.random() * 1000000)}`;
+    const catalogName1 = getRandomCatalogName();
+    const catalogName2 = getRandomCatalogName();
+    const catalogName3 = getRandomCatalogName();
 
     const config: CatalogConfig = {
       description: "foo bar",
