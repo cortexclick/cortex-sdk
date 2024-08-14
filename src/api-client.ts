@@ -1,3 +1,5 @@
+import Path from "node:path";
+
 import { version } from "../package.json";
 
 type Method = "POST" | "GET" | "PUT" | "DELETE";
@@ -12,6 +14,7 @@ export class CortexApiClient {
     private org: string,
     private apiUrl: string,
     private accessToken: string,
+    private apiVersion: string = "v1",
   ) {}
 
   async POST(path: string, body?: any) {
@@ -36,7 +39,8 @@ export class CortexApiClient {
       throw new Error("Request body too large");
     }
 
-    return fetch(`${this.apiUrl}/org/${this.org}${path}`, {
+    const url = Path.join(this.apiUrl, this.apiVersion, "org", this.org, path);
+    return fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
@@ -54,7 +58,8 @@ export class CortexApiClient {
       throw new Error("Request body too large");
     }
 
-    return fetch(`${this.apiUrl}/org/${this.org}${path}`, {
+    const url = Path.join(this.apiUrl, this.apiVersion, "org", this.org, path);
+    return fetch(url, {
       method,
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
