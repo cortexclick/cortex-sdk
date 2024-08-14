@@ -58,7 +58,13 @@ export class CortexApiClient {
       throw new Error("Request body too large");
     }
 
-    const url = Path.posix.join(this.apiUrl, this.apiVersion, "org", this.org, path);
+    const url = Path.posix.join(
+      this.apiUrl,
+      this.apiVersion,
+      "org",
+      this.org,
+      path,
+    );
     return fetch(url, {
       method,
       headers: {
