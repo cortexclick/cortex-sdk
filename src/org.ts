@@ -32,7 +32,7 @@ export class OrgConfig {
   }
 
   static async get(client: CortexApiClient): Promise<OrgConfig> {
-    const res = await client.GET("/org-config");
+    const res = await client.GET("/orgConfig");
     if (res.status !== 200) {
       throw new Error(`Failed to configure cortex: ${res.statusText}`);
     }
@@ -50,12 +50,12 @@ export class OrgConfig {
     client: CortexApiClient,
     config: OrgConfigOpts,
   ): Promise<OrgConfig> {
-    const getRes = await client.GET("/org-config");
+    const getRes = await client.GET("/orgConfig");
     let res: Response;
     if (getRes.status !== 200) {
-      res = await client.POST("/org-config", config);
+      res = await client.POST("/orgConfig", config);
     } else {
-      res = await client.PUT("/org-config", config);
+      res = await client.PUT("/orgConfig", config);
     }
 
     if (res.status > 201) {
