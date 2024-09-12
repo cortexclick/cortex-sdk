@@ -1,6 +1,6 @@
-import { Cortex } from "./cortex";
-import { CortexApiClient } from "./api-client";
 import { Readable } from "stream";
+import { CortexApiClient } from "./api-client";
+import { Cortex } from "./cortex";
 import { processStream } from "./utils/streaming";
 
 export type ContentCommandType =
@@ -432,9 +432,7 @@ export class Content {
   }
 
   async getPublishTargets() {
-    const res = await this.apiClient.GET(
-      `/content/${this._id}/publish-targets`,
-    );
+    const res = await this.apiClient.GET(`/content/${this._id}/publishTargets`);
 
     if (res.status !== 200) {
       throw new Error(
