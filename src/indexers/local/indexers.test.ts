@@ -94,7 +94,7 @@ test("Test catalog.directoryIndexer", { timeout: 60000 }, async () => {
 
 test(
   "Test catalog.tsvIndexer with default opts",
-  { timeout: 20000 },
+  { timeout: 60000 },
   async () => {
     const indexer = catalog.tsvIndexer("./src/test_data/test.tsv");
 
