@@ -2,20 +2,16 @@ import { expect, test, afterEach } from "vitest";
 import { Catalog, CatalogConfig } from "./catalog";
 import { testClient } from "./vitest-test-client";
 
-let catalog: Catalog;
+let catalog: Catalog | undefined;
 
 afterEach(async () => {
-  try {
-    if (catalog) {
-      await catalog.delete();
-    }
-  } catch {
-    // probably catalog has already been deleted by a test, so ignore
+  if (catalog) {
+    await catalog.delete();
   }
 });
 
-test("Catalog CRUD", { timeout: 10000 }, async () => {
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+test("Catalog CRUD", { timeout: 20000 }, async () => {
+  const catalogName = `catalog-sdk-test-${Date.now()}`;
 
   const config: CatalogConfig = {
     description: "foo bar",
@@ -58,6 +54,8 @@ test("Catalog CRUD", { timeout: 10000 }, async () => {
 
   // delete
   await catalog.delete();
+  catalog = undefined;
+  
   // assert that the get fails
   await expect(async () => {
     await testClient.getCatalog(catalogName);
