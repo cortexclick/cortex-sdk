@@ -205,25 +205,25 @@ export class Catalog {
     return { warnings: body?.warnings ?? [] };
   }
 
-  async delete() {
+  public async delete() {
     this.checkDeleted();
     this.deleted = true;
     await this.apiClient.DELETE(`/catalogs/${this.name}`);
     return;
   }
 
-  async getDocument(documentId: string): Promise<Document> {
+  public async getDocument(documentId: string): Promise<Document> {
     this.checkDeleted();
     return Document.get(this.apiClient, this, documentId);
   }
 
-  async deleteDocument(documentId: string) {
+  public async deleteDocument(documentId: string) {
     this.checkDeleted();
     const doc = await this.getDocument(documentId);
     await doc.delete();
   }
 
-  async listDocuments(
+  public async listDocuments(
     paginationOpts?: DocumentPaginationOpts,
   ): Promise<DocumentListResult> {
     const { page, pageSize } = paginationOpts || { page: 1, pageSize: 50 };
@@ -249,19 +249,19 @@ export class Catalog {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  jsonIndexer(documents: any[], opts?: JSONIndexerOpts) {
+  public jsonIndexer(documents: any[], opts?: JSONIndexerOpts) {
     return new JSONIndexer(this, documents, opts);
   }
 
-  directoryIndexer(opts: DirectoryIndexerOpts) {
+  public directoryIndexer(opts: DirectoryIndexerOpts) {
     return new DirectoryIndexer(this, opts);
   }
 
-  tsvIndexer(file: string, opts?: TSVIndexerOpts) {
+  public tsvIndexer(file: string, opts?: TSVIndexerOpts) {
     return new TSVIndexer(this, file, opts);
   }
 
-  shopifyIndexer(opts: ShopifyIndexerOpts) {
+  public shopifyIndexer(opts: ShopifyIndexerOpts) {
     return new ShopifyIndexer(this, opts);
   }
 
