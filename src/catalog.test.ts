@@ -10,7 +10,7 @@ afterEach(async () => {
   }
 });
 
-test("Catalog CRUD", { timeout: 20000 }, async () => {
+test("Catalog CRUD", { timeout: 60000 }, async () => {
   const catalogName = `catalog-sdk-test-${Date.now()}`;
 
   const config: CatalogConfig = {

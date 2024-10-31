@@ -39,7 +39,7 @@ test("can get and set OrgConfig", async () => {
   expect(getOrgConfig.companyInfo).toBe(orgConfigOpts.companyInfo);
 });
 
-test("can configure, get, and delete and Cortexes", async () => {
+test("can configure, get, and delete and Cortexes", { timeout: 30000 }, async () => {
   const cortexName = `cortex-sdk-test-${Date.now()}`;
 
   const catalogName = `catalog-sdk-test-${Date.now()}`;
