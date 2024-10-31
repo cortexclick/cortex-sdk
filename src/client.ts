@@ -5,14 +5,14 @@ import { CortexApiClient } from "./api-client";
 import { Chat, StreamingChatResult } from "./chat";
 import { Content, ContentStatus, StreamingContentResult } from "./content";
 import { Readable } from "stream";
-import { Indexer } from "./indexers/hosted/types";
 import {
   GithubDataSourceConfig,
+  Indexer,
   IndexerConfig,
   IndexerExecutionHistory,
   IndexerScheduleFrequency,
   WebScraperDataSourceConfig,
-} from "./indexers/hosted/types";
+} from "./indexers/hosted/indexer";
 
 export type CortexClientArgs = {
   org: string;

@@ -10,4 +10,4 @@ export * from "./indexers/local/directory-indexer";
 export * from "./indexers/local/json-indexer";
 export * from "./indexers/local/tsv-indexer";
 export * from "./indexers/local/shopify-indexer";
-export * from "./indexers/hosted/types";
+export * from "./indexers/hosted/indexer";
