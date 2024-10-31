@@ -92,7 +92,8 @@ export class Indexer {
     };
     const res = await apiClient.POST(`/indexers`, indexer);
     if (res.status !== 201) {
-      throw new Error(`Failed to create indexer: ${res.statusText}`);
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to create indexer: ${message}`);
     }
     return indexer;
   }
@@ -103,7 +104,8 @@ export class Indexer {
   ): Promise<IndexerConfig> {
     const res = await apiClient.PUT(`/indexers/${indexer.name}`, indexer);
     if (res.status !== 200) {
-      throw new Error(`Failed to update indexer: ${res.statusText}`);
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to update indexer: ${message}`);
     }
     return indexer;
   }
@@ -126,7 +128,8 @@ export class Indexer {
   static async run(apiClient: CortexApiClient, name: string): Promise<void> {
     const res = await apiClient.POST(`/indexers/${name}/run`);
     if (res.status !== 200) {
-      throw new Error(`Failed to run indexer: ${res.statusText}`);
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to run indexer: ${message}`);
     }
   }
 
