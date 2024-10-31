@@ -171,7 +171,8 @@ export class Cortex {
     }
 
     if (res.status > 201) {
-      throw new Error(`Failed to configure cortex: ${res.statusText}`);
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to configure cortex: ${message}`);
     }
     return new Cortex(config, apiClient, name);
   }

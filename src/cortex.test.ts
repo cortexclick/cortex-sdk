@@ -1,7 +1,20 @@
-import { expect, test } from "vitest";
+import { afterEach, expect, test } from "vitest";
 import { OrgConfigOpts } from "./org";
 import { CortexConfig } from "./cortex";
 import { testClient } from "./vitest-test-client";
+import { Catalog, CatalogConfig } from "./catalog";
+
+let catalog: Catalog | undefined;
+let catalog2: Catalog | undefined;
+
+afterEach(async () => {
+  if (catalog) {
+    await catalog.delete();
+  }
+  if (catalog2) {
+    await catalog2.delete();
+  }
+});
 
 test("can get and set OrgConfig", async () => {
   const orgConfigOpts: OrgConfigOpts = {
@@ -27,11 +40,22 @@ test("can get and set OrgConfig", async () => {
 });
 
 test("can configure, get, and delete and Cortexes", async () => {
-  const cortexName = `cortex-${Math.floor(Math.random() * 10000)}`;
+  const cortexName = `cortex-sdk-test-${Date.now()}`;
+
+  const catalogName = `catalog-sdk-test-${Date.now()}`;
+  const catalogName2 = `catalog-sdk-test-${Date.now() + 1}`;
+
+  const config: CatalogConfig = {
+    description: "foo bar",
+    instructions: ["a", "b"],
+  };
+
+  catalog = await testClient.configureCatalog(catalogName, config);
+  catalog2 = await testClient.configureCatalog(catalogName2, config);
 
   const cortexConfig: CortexConfig = {
     friendlyName: "Cortex AI",
-    catalogs: ["cat-1", "cat-2"],
+    catalogs: [catalogName, catalogName2],
     instructions: ["do your job", "do it well"],
     public: false,
     customizations: {
