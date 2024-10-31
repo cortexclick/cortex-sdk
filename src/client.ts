@@ -5,7 +5,14 @@ import { CortexApiClient } from "./api-client";
 import { Chat, StreamingChatResult } from "./chat";
 import { Content, ContentStatus, StreamingContentResult } from "./content";
 import { Readable } from "stream";
-import { GithubDataSourceConfig, Indexer, IndexerDataSource, IndexerExecutionHistory, IndexerScheduleFrequency, WebScraperDataSourceConfig } from "./indexers/hosted/types";
+import {
+  GithubDataSourceConfig,
+  Indexer,
+  IndexerDataSource,
+  IndexerExecutionHistory,
+  IndexerScheduleFrequency,
+  WebScraperDataSourceConfig,
+} from "./indexers/hosted/types";
 
 export type CortexClientArgs = {
   org: string;
@@ -165,12 +172,28 @@ export class CortexClient {
     return Catalog.list(this.apiClient);
   }
 
-  async createWebScraperIndexer(name: string, catalogName: string, schedule: IndexerScheduleFrequency, config: WebScraperDataSourceConfig): Promise<Indexer> {
-    return this.createIndexer(name, catalogName, schedule, { type: "webScraper", config });
+  async createWebScraperIndexer(
+    name: string,
+    catalogName: string,
+    schedule: IndexerScheduleFrequency,
+    config: WebScraperDataSourceConfig,
+  ): Promise<Indexer> {
+    return this.createIndexer(name, catalogName, schedule, {
+      type: "webScraper",
+      config,
+    });
   }
-      
-  async createGithubIndexer(name: string, catalogName: string, schedule: IndexerScheduleFrequency, config: GithubDataSourceConfig): Promise<Indexer> {
-    return this.createIndexer(name, catalogName, schedule, { type: "github", config });
+
+  async createGithubIndexer(
+    name: string,
+    catalogName: string,
+    schedule: IndexerScheduleFrequency,
+    config: GithubDataSourceConfig,
+  ): Promise<Indexer> {
+    return this.createIndexer(name, catalogName, schedule, {
+      type: "github",
+      config,
+    });
   }
 
   async getIndexer(name: string): Promise<Indexer> {
@@ -187,7 +210,7 @@ export class CortexClient {
       throw new Error(`Failed to delete indexer: ${res.statusText}`);
     }
   }
-  
+
   async listIndexers(): Promise<Indexer[]> {
     const res = await this.apiClient.GET(`/indexers`);
     if (res.status !== 200) {
@@ -195,7 +218,7 @@ export class CortexClient {
     }
     return res.json();
   }
-  
+
   async updateIndexer(indexer: Indexer): Promise<Indexer> {
     const res = await this.apiClient.PUT(`/indexers/${indexer.name}`, indexer);
     if (res.status !== 200) {
@@ -203,17 +226,31 @@ export class CortexClient {
     }
     return indexer;
   }
-  
-  async getIndexerExecutionHistory(name: string): Promise<IndexerExecutionHistory> {
+
+  async getIndexerExecutionHistory(
+    name: string,
+  ): Promise<IndexerExecutionHistory> {
     const res = await this.apiClient.GET(`/indexers/${name}/history`);
     if (res.status !== 200) {
-      throw new Error(`Failed to get indexer execution history: ${res.statusText}`);
+      throw new Error(
+        `Failed to get indexer execution history: ${res.statusText}`,
+      );
     }
     return res.json();
   }
 
-  private async createIndexer(name: string, catalogName: string, schedule: IndexerScheduleFrequency, dataSource: IndexerDataSource): Promise<Indexer> {
-    const indexer: Indexer = { name, dataSource, dataTarget: { catalogName }, schedule: { frequency: schedule } };
+  private async createIndexer(
+    name: string,
+    catalogName: string,
+    schedule: IndexerScheduleFrequency,
+    dataSource: IndexerDataSource,
+  ): Promise<Indexer> {
+    const indexer: Indexer = {
+      name,
+      dataSource,
+      dataTarget: { catalogName },
+      schedule: { frequency: schedule },
+    };
     const res = await this.apiClient.POST(`/indexers`, indexer);
     if (res.status !== 201) {
       throw new Error(`Failed to create indexer: ${res.statusText}`);

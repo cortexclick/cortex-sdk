@@ -50,7 +50,7 @@ export enum IndexerScheduleFrequency {
   Daily = "daily",
   Weekly = "weekly",
   Monthly = "monthly",
-};
+}
 
 export type IndexerSchedule = {
   frequency: IndexerScheduleFrequency;
