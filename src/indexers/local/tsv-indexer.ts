@@ -1,5 +1,5 @@
 import * as fs from "node:fs";
-import { Catalog } from "../catalog";
+import { Catalog } from "../../catalog";
 import { JSONIndexer } from "./json-indexer";
 
 // intentionally operates on any type

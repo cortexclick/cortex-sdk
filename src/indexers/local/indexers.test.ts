@@ -1,7 +1,7 @@
 import { expect, test, beforeEach, afterEach } from "vitest";
-import { Catalog, CatalogConfig } from "../catalog";
-import { JSONDocument } from "../document";
-import { testClient } from "../vitest-test-client";
+import { Catalog, CatalogConfig } from "../../catalog";
+import { JSONDocument } from "../../document";
+import { testClient } from "../../vitest-test-client";
 
 let catalog: Catalog;
 
