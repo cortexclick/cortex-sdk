@@ -55,7 +55,7 @@ test("Catalog CRUD", { timeout: 20000 }, async () => {
   // delete
   await catalog.delete();
   catalog = undefined;
-  
+
   // assert that the get fails
   await expect(async () => {
     await testClient.getCatalog(catalogName);
