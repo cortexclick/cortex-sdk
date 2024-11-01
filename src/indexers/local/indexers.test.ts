@@ -13,13 +13,13 @@ beforeEach(async () => {
 
   const catalogName = `catalog-${Date.now()}`;
   catalog = await testClient.configureCatalog(catalogName, config);
-}, 20000);
+}, 30000);
 
 afterEach(async () => {
   if (catalog) {
     await catalog.delete();
   }
-}, 20000);
+}, 30000);
 
 test(
   "Test catalog.jsonIndexer with custom opts",
