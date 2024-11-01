@@ -5,6 +5,12 @@ import { CortexApiClient } from "./api-client";
 import { Chat, StreamingChatResult } from "./chat";
 import { Content, ContentStatus, StreamingContentResult } from "./content";
 import { Readable } from "stream";
+import {
+  GithubDataSourceConfig,
+  Indexer,
+  IndexerScheduleFrequency,
+  WebScraperDataSourceConfig,
+} from "./indexers/hosted/indexer";
 
 export type CortexClientArgs = {
   org: string;
@@ -162,5 +168,40 @@ export class CortexClient {
 
   async listCatalogs() {
     return Catalog.list(this.apiClient);
+  }
+
+  async createWebScraperIndexer(
+    name: string,
+    catalogName: string,
+    schedule: IndexerScheduleFrequency,
+    config: WebScraperDataSourceConfig,
+  ): Promise<Indexer> {
+    return Indexer.create(this.apiClient, name, catalogName, schedule, {
+      type: "webScraper",
+      config,
+    });
+  }
+
+  async createGithubIndexer(
+    name: string,
+    catalogName: string,
+    schedule: IndexerScheduleFrequency,
+    config: GithubDataSourceConfig,
+  ): Promise<Indexer> {
+    if (!config.code) {
+      config.code = {};
+    }
+    return Indexer.create(this.apiClient, name, catalogName, schedule, {
+      type: "github",
+      config,
+    });
+  }
+
+  async getIndexer(name: string): Promise<Indexer> {
+    return Indexer.get(this.apiClient, name);
+  }
+
+  async listIndexers(): Promise<Indexer[]> {
+    return Indexer.list(this.apiClient);
   }
 }

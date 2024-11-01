@@ -1,7 +1,22 @@
-import { expect, test } from "vitest";
+import { afterEach, expect, test } from "vitest";
 import { OrgConfigOpts } from "./org";
 import { CortexConfig } from "./cortex";
 import { testClient } from "./vitest-test-client";
+import { Catalog, CatalogConfig } from "./catalog";
+
+let catalog: Catalog | undefined;
+let catalog2: Catalog | undefined;
+
+afterEach(async () => {
+  if (catalog) {
+    await catalog.delete();
+    catalog = undefined;
+  }
+  if (catalog2) {
+    await catalog2.delete();
+    catalog2 = undefined;
+  }
+});
 
 test("can get and set OrgConfig", async () => {
   const orgConfigOpts: OrgConfigOpts = {
@@ -26,42 +41,57 @@ test("can get and set OrgConfig", async () => {
   expect(getOrgConfig.companyInfo).toBe(orgConfigOpts.companyInfo);
 });
 
-test("can configure, get, and delete and Cortexes", async () => {
-  const cortexName = `cortex-${Math.floor(Math.random() * 10000)}`;
+test(
+  "can configure, get, and delete and Cortexes",
+  { timeout: 30000 },
+  async () => {
+    const cortexName = `cortex-sdk-test-${Date.now()}`;
 
-  const cortexConfig: CortexConfig = {
-    friendlyName: "Cortex AI",
-    catalogs: ["cat-1", "cat-2"],
-    instructions: ["do your job", "do it well"],
-    public: false,
-    customizations: {
-      rules: ["be nice to the user"],
-      personality: ["saucy"],
-      chatVerbosity: "concise",
-      writeVerbosity: "long-form",
-    },
-    chatConfig: {
-      intro: "hello world",
-      examples: ["q1", "q2"],
-      greeting: "who lives in a pineapple under the sea? CORTEX AI.",
-    },
-    overrides: {
-      companyInfo: "a very good company that does AI stuff",
-      companyName: "Cortex Click, Inc. --test",
-    },
-  };
+    const catalogName = `catalog-sdk-test-${Date.now()}`;
+    const catalogName2 = `catalog-sdk-test-${Date.now() + 1}`;
 
-  let cortex = await testClient.configureCortex(cortexName, cortexConfig);
+    const config: CatalogConfig = {
+      description: "foo bar",
+      instructions: ["a", "b"],
+    };
 
-  cortex = await testClient.getCortex(cortexName);
-  expect(cortex.config.catalogs).toStrictEqual(cortexConfig.catalogs);
-  expect(cortex.config.overrides?.inheritRules).toBe(true); // test input doesn't specify `inheritRules`, should be true by default
-  // TODO - check all the properties
+    catalog = await testClient.configureCatalog(catalogName, config);
+    catalog2 = await testClient.configureCatalog(catalogName2, config);
 
-  // delete the cortex
-  await cortex.delete();
-  // assert that the get fails
-  await expect(async () => {
-    await testClient.getCortex(cortexName);
-  }).rejects.toThrowError("Failed to get cortex: Not Found");
-});
+    const cortexConfig: CortexConfig = {
+      friendlyName: "Cortex AI",
+      catalogs: [catalogName, catalogName2],
+      instructions: ["do your job", "do it well"],
+      public: false,
+      customizations: {
+        rules: ["be nice to the user"],
+        personality: ["saucy"],
+        chatVerbosity: "concise",
+        writeVerbosity: "long-form",
+      },
+      chatConfig: {
+        intro: "hello world",
+        examples: ["q1", "q2"],
+        greeting: "who lives in a pineapple under the sea? CORTEX AI.",
+      },
+      overrides: {
+        companyInfo: "a very good company that does AI stuff",
+        companyName: "Cortex Click, Inc. --test",
+      },
+    };
+
+    let cortex = await testClient.configureCortex(cortexName, cortexConfig);
+
+    cortex = await testClient.getCortex(cortexName);
+    expect(cortex.config.catalogs).toStrictEqual(cortexConfig.catalogs);
+    expect(cortex.config.overrides?.inheritRules).toBe(true); // test input doesn't specify `inheritRules`, should be true by default
+    // TODO - check all the properties
+
+    // delete the cortex
+    await cortex.delete();
+    // assert that the get fails
+    await expect(async () => {
+      await testClient.getCortex(cortexName);
+    }).rejects.toThrowError("Failed to get cortex: Not Found");
+  },
+);

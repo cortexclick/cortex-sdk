@@ -1,4 +1,4 @@
-import { Catalog } from "../catalog";
+import { Catalog } from "../../catalog";
 
 type Product = {
   id: string;
