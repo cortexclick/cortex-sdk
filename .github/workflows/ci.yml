@@ -6,6 +6,8 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: "0 21 * * *" # Runs at 1 or 2 PM PST (9 PM UTC) every day
 
 jobs:
   lint:
