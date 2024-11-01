@@ -10,9 +10,11 @@ let catalog2: Catalog | undefined;
 afterEach(async () => {
   if (catalog) {
     await catalog.delete();
+    catalog = undefined;
   }
   if (catalog2) {
     await catalog2.delete();
+    catalog2 = undefined;
   }
 });
 

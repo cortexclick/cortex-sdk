@@ -11,7 +11,7 @@ export type IndexerExecutionResult = {
 };
 
 export type IndexerExecutionHistory = {
-  results: IndexerExecutionResult[]; // the size of this array is bounded - see trimIndexerExecutionHistoryIfNeeded
+  results: IndexerExecutionResult[]; // the size of this array is bounded to the most recent 100 executions
 };
 
 export type WebScraperDataSourceConfig = {
