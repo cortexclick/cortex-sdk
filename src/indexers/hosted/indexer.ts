@@ -66,15 +66,18 @@ export type IndexerConfig = {
 };
 
 export class Indexer {
-  static async get(
-    apiClient: CortexApiClient,
-    name: string,
-  ): Promise<IndexerConfig> {
+  private constructor(
+    readonly config: IndexerConfig,
+    private readonly apiClient: CortexApiClient,
+  ) {}
+
+  static async get(apiClient: CortexApiClient, name: string): Promise<Indexer> {
     const res = await apiClient.GET(`/indexers/${name}`);
     if (res.status !== 200) {
       throw new Error(`Failed to get indexer: ${res.statusText}`);
     }
-    return res.json();
+    const config = await res.json();
+    return new Indexer(config, apiClient);
   }
 
   static async create(
@@ -83,7 +86,7 @@ export class Indexer {
     catalogName: string,
     schedule: IndexerScheduleFrequency,
     dataSource: IndexerDataSource,
-  ): Promise<IndexerConfig> {
+  ): Promise<Indexer> {
     const indexer: IndexerConfig = {
       name,
       dataSource,
@@ -95,54 +98,54 @@ export class Indexer {
       const message = res.status === 400 ? await res.text() : res.statusText;
       throw new Error(`Failed to create indexer: ${message}`);
     }
-    return indexer;
+    return new Indexer(indexer, apiClient);
   }
 
-  static async update(
-    apiClient: CortexApiClient,
-    indexer: IndexerConfig,
-  ): Promise<IndexerConfig> {
-    const res = await apiClient.PUT(`/indexers/${indexer.name}`, indexer);
-    if (res.status !== 200) {
-      const message = res.status === 400 ? await res.text() : res.statusText;
-      throw new Error(`Failed to update indexer: ${message}`);
-    }
-    return indexer;
-  }
-
-  static async list(apiClient: CortexApiClient): Promise<IndexerConfig[]> {
+  static async list(apiClient: CortexApiClient): Promise<Indexer[]> {
     const res = await apiClient.GET(`/indexers`);
     if (res.status !== 200) {
       throw new Error(`Failed to list indexers: ${res.statusText}`);
     }
-    return res.json();
+
+    const indexers: IndexerConfig[] = (await res.json()).indexers;
+    return indexers.map((indexer) => new Indexer(indexer, apiClient));
   }
 
-  static async delete(apiClient: CortexApiClient, name: string): Promise<void> {
-    const res = await apiClient.DELETE(`/indexers/${name}`);
+  async update(): Promise<void> {
+    const res = await this.apiClient.PUT(
+      `/indexers/${this.config.name}`,
+      this.config,
+    );
+    if (res.status !== 200) {
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to update indexer: ${message}`);
+    }
+  }
+
+  async delete(): Promise<void> {
+    const res = await this.apiClient.DELETE(`/indexers/${this.config.name}`);
     if (res.status !== 200) {
       throw new Error(`Failed to delete indexer: ${res.statusText}`);
     }
   }
 
-  static async run(apiClient: CortexApiClient, name: string): Promise<void> {
-    const res = await apiClient.POST(`/indexers/${name}/run`);
+  async run(): Promise<void> {
+    const res = await this.apiClient.POST(`/indexers/${this.config.name}/run`);
     if (res.status !== 200) {
       const message = res.status === 400 ? await res.text() : res.statusText;
       throw new Error(`Failed to run indexer: ${message}`);
     }
   }
 
-  static async getExecutionHistory(
-    apiClient: CortexApiClient,
-    name: string,
-  ): Promise<IndexerExecutionHistory> {
-    const res = await apiClient.GET(`/indexers/${name}/history`);
+  async getExecutionHistory(): Promise<IndexerExecutionHistory> {
+    const res = await this.apiClient.GET(
+      `/indexers/${this.config.name}/history`,
+    );
     if (res.status !== 200) {
       throw new Error(
         `Failed to get indexer execution history: ${res.statusText}`,
       );
     }
-    return res.json();
+    return await res.json();
   }
 }

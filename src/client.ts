@@ -8,8 +8,6 @@ import { Readable } from "stream";
 import {
   GithubDataSourceConfig,
   Indexer,
-  IndexerConfig,
-  IndexerExecutionHistory,
   IndexerScheduleFrequency,
   WebScraperDataSourceConfig,
 } from "./indexers/hosted/indexer";
@@ -177,7 +175,7 @@ export class CortexClient {
     catalogName: string,
     schedule: IndexerScheduleFrequency,
     config: WebScraperDataSourceConfig,
-  ): Promise<IndexerConfig> {
+  ): Promise<Indexer> {
     return Indexer.create(this.apiClient, name, catalogName, schedule, {
       type: "webScraper",
       config,
@@ -189,28 +187,21 @@ export class CortexClient {
     catalogName: string,
     schedule: IndexerScheduleFrequency,
     config: GithubDataSourceConfig,
-  ): Promise<IndexerConfig> {
+  ): Promise<Indexer> {
+    if (!config.code) {
+      config.code = {};
+    }
     return Indexer.create(this.apiClient, name, catalogName, schedule, {
       type: "github",
       config,
     });
   }
 
-  async getIndexer(name: string): Promise<IndexerConfig> {
+  async getIndexer(name: string): Promise<Indexer> {
     return Indexer.get(this.apiClient, name);
   }
 
-  async listIndexers(): Promise<IndexerConfig[]> {
+  async listIndexers(): Promise<Indexer[]> {
     return Indexer.list(this.apiClient);
-  }
-
-  async runIndexer(name: string): Promise<void> {
-    return Indexer.run(this.apiClient, name);
-  }
-
-  async getIndexerExecutionHistory(
-    name: string,
-  ): Promise<IndexerExecutionHistory> {
-    return Indexer.getExecutionHistory(this.apiClient, name);
   }
 }
