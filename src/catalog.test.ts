@@ -8,7 +8,7 @@ afterEach(async () => {
   if (catalog) {
     await catalog.delete();
   }
-});
+}, 20000);
 
 test("Catalog CRUD", { timeout: 60000 }, async () => {
   const catalogName = `catalog-sdk-test-${Date.now()}`;

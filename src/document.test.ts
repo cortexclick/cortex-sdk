@@ -15,13 +15,13 @@ beforeEach(async () => {
   };
 
   catalog = await testClient.configureCatalog(catalogName, config);
-});
+}, 20000);
 
 afterEach(async () => {
   if (catalog) {
     await catalog.delete();
   }
-});
+}, 20000);
 
 test("Test upsertDocuments inline text batch", { timeout: 60000 }, async () => {
   const docs: TextDocument[] = [
