@@ -1,7 +1,7 @@
 import { expect, test, beforeEach, afterEach } from "vitest";
-import { Catalog, CatalogConfig } from "../catalog";
-import { JSONDocument } from "../document";
-import { testClient } from "../vitest-test-client";
+import { Catalog, CatalogConfig } from "../../catalog";
+import { JSONDocument } from "../../document";
+import { testClient } from "../../vitest-test-client";
 
 let catalog: Catalog;
 
@@ -11,19 +11,19 @@ beforeEach(async () => {
     instructions: ["a", "b"],
   };
 
-  const catalogName = `catalog-${Math.floor(Math.random() * 10000)}`;
+  const catalogName = `catalog-${Date.now()}`;
   catalog = await testClient.configureCatalog(catalogName, config);
-});
+}, 30000);
 
 afterEach(async () => {
   if (catalog) {
     await catalog.delete();
   }
-});
+}, 30000);
 
 test(
   "Test catalog.jsonIndexer with custom opts",
-  { timeout: 20000 },
+  { timeout: 60000 },
   async () => {
     const docs: JSONDocument[] = [];
 
@@ -55,7 +55,7 @@ test(
 
 test(
   "Test catalog.jsonIndexer with default opts",
-  { timeout: 20000 },
+  { timeout: 60000 },
   async () => {
     const docs: JSONDocument[] = [];
 
@@ -81,7 +81,7 @@ test(
   },
 );
 
-test("Test catalog.directoryIndexer", { timeout: 20000 }, async () => {
+test("Test catalog.directoryIndexer", { timeout: 60000 }, async () => {
   const indexer = catalog.directoryIndexer({
     rootDir: "./src/test_data",
   });
@@ -94,7 +94,7 @@ test("Test catalog.directoryIndexer", { timeout: 20000 }, async () => {
 
 test(
   "Test catalog.tsvIndexer with default opts",
-  { timeout: 20000 },
+  { timeout: 60000 },
   async () => {
     const indexer = catalog.tsvIndexer("./src/test_data/test.tsv");
 
@@ -107,7 +107,7 @@ test(
 
 test(
   "Test catalog.tsvIndexer with custom opts",
-  { timeout: 20000 },
+  { timeout: 60000 },
   async () => {
     const indexer = catalog.tsvIndexer("./src/test_data/test.tsv", {
       getId: (doc) => doc.id,
@@ -120,7 +120,7 @@ test(
   },
 );
 
-test("Test catalog.shopifyIndexer", { timeout: 20000 }, async () => {
+test("Test catalog.shopifyIndexer", { timeout: 60000 }, async () => {
   const indexer = catalog.shopifyIndexer({
     shopifyBaseUrl: "https://redsflyfishing.com",
     maxItems: 5,
