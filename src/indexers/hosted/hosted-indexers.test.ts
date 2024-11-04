@@ -21,13 +21,13 @@ beforeEach(async () => {
 
   const catalogName = `catalog-${Date.now()}`;
   catalog = await testClient.configureCatalog(catalogName, config);
-}, 20000);
+}, 30000);
 
 afterEach(async () => {
   if (catalog) {
     await catalog.delete(); // this will also delete any indexer referencing this catalog
   }
-}, 20000);
+}, 30000);
 
 test("Test hosted indexer APIs", { timeout: 60000 }, async () => {
   const indexerName = `indexer-sdk-test-web-${Date.now()}`;

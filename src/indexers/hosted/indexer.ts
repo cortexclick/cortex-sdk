@@ -131,7 +131,8 @@ export class Indexer {
 
   async run(): Promise<void> {
     const res = await this.apiClient.POST(`/indexers/${this.config.name}/run`);
-    if (res.status !== 200) {
+    // 200 is returned if the indexer was already running, 202 is returned if the indexer was started
+    if (res.status !== 202 && res.status !== 200) {
       const message = res.status === 400 ? await res.text() : res.statusText;
       throw new Error(`Failed to run indexer: ${message}`);
     }
