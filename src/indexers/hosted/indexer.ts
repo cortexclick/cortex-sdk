@@ -152,8 +152,7 @@ export class Indexer {
     const startTime = performance.now();
     let executionResult: IndexerExecutionResult | undefined;
     while (!executionResult) {
-      const history: IndexerExecutionHistory =
-        await this.getExecutionHistory();
+      const history: IndexerExecutionHistory = await this.getExecutionHistory();
       if (
         history &&
         history.results.length > 0 &&
