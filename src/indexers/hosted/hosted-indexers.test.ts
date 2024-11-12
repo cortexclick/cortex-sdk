@@ -45,7 +45,9 @@ test("Test hosted indexer APIs", { timeout: 60000 }, async () => {
   expect(list).toHaveLength(1);
   expect(list[0].config).toMatchObject(indexer.config);
 
-  const executionResult = await indexer.run({ waitForCompletion: true });
+  const executionResult = await indexer.run({
+    waitForCompletionTimeoutMs: 60000,
+  });
 
   expect(executionResult.status).toBe("success");
   expect(executionResult!.errors).toHaveLength(0);
