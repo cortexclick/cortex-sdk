@@ -48,8 +48,8 @@ test("Test hosted indexer APIs", { timeout: 60000 }, async () => {
   const executionResult = await indexer.run({ waitForCompletion: true });
 
   expect(executionResult.status).toBe("success");
-  expect(executionResult!.errors).toHaveLength(0);
-  expect(executionResult!.warnings).toHaveLength(0);
+  expect(executionResult.errors).toHaveLength(0);
+  expect(executionResult.warnings).toHaveLength(0);
 
   await indexer.delete();
 });
