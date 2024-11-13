@@ -66,7 +66,7 @@ export type IndexerConfig = {
   schedule: IndexerSchedule;
 };
 
-export type RunOptions = { waitForCompletionTimeoutMs?: number };
+export type RunOptions = { waitForCompletion: boolean };
 
 export class Indexer {
   private constructor(
@@ -132,10 +132,11 @@ export class Indexer {
     }
   }
 
-  async run(options: {
-    waitForCompletionTimeoutMs: number;
-  }): Promise<IndexerExecutionResult>;
   async run(): Promise<void>;
+  async run(options: { waitForCompletion: false }): Promise<void>;
+  async run(options: {
+    waitForCompletion: true;
+  }): Promise<IndexerExecutionResult>;
   async run(options?: RunOptions): Promise<void | IndexerExecutionResult> {
     const res = await this.apiClient.POST(`/indexers/${this.config.name}/run`);
     // 200 is returned if the indexer was already running, 202 is returned if the indexer was started
@@ -144,11 +145,10 @@ export class Indexer {
       throw new Error(`Failed to run indexer: ${message}`);
     }
 
-    if (!options?.waitForCompletionTimeoutMs) {
+    if (!options?.waitForCompletion) {
       return;
     }
 
-    const startTime = performance.now();
     let executionResult: IndexerExecutionResult | undefined;
     while (!executionResult) {
       const history: IndexerExecutionHistory = await this.getExecutionHistory();
@@ -159,12 +159,6 @@ export class Indexer {
       ) {
         executionResult = history.results[0];
       } else {
-        if (
-          performance.now() - startTime >
-          options.waitForCompletionTimeoutMs
-        ) {
-          throw new Error("Timed out waiting for indexer to complete");
-        }
         await setTimeout(500);
       }
     }
