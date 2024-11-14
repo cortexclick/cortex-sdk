@@ -1,12 +1,9 @@
-import { setTimeout } from "timers/promises";
 import { expect, test, beforeEach, afterEach } from "vitest";
 import { Catalog, CatalogConfig } from "../../catalog";
 import { testClient } from "../../vitest-test-client";
 import {
   GithubDataSourceConfig,
   Indexer,
-  IndexerExecutionHistory,
-  IndexerExecutionResult,
   IndexerScheduleFrequency,
   WebScraperDataSourceConfig,
 } from "./indexer";
@@ -44,30 +41,15 @@ test("Test hosted indexer APIs", { timeout: 60000 }, async () => {
   const retrievedIndexer: Indexer = await testClient.getIndexer(indexerName);
   expect(retrievedIndexer.config).toMatchObject(indexer.config);
 
-  await indexer.run(); // start the run and do a few other things before checking status so the indexer has time to run
-
   const list = await testClient.listIndexers();
   expect(list).toHaveLength(1);
   expect(list[0].config).toMatchObject(indexer.config);
 
-  let executionResult: IndexerExecutionResult | undefined;
-  while (!executionResult) {
-    const history: IndexerExecutionHistory =
-      await indexer.getExecutionHistory();
-    if (
-      history &&
-      history.results.length > 0 &&
-      history.results[0].status !== "inProgress"
-    ) {
-      executionResult = history.results[0];
-    } else {
-      await setTimeout(500);
-    }
-  }
+  const executionResult = await indexer.run({ waitForCompletion: true });
 
-  expect(executionResult!.status).toBe("success");
-  expect(executionResult!.errors).toHaveLength(0);
-  expect(executionResult!.warnings).toHaveLength(0);
+  expect(executionResult.status).toBe("success");
+  expect(executionResult.errors).toHaveLength(0);
+  expect(executionResult.warnings).toHaveLength(0);
 
   await indexer.delete();
 });

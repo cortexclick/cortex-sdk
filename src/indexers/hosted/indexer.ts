@@ -1,3 +1,4 @@
+import { setTimeout } from "timers/promises";
 import { CortexApiClient } from "../../api-client";
 
 export type IndexerExecutionStatus = "success" | "failure" | "inProgress";
@@ -65,6 +66,8 @@ export type IndexerConfig = {
   schedule: IndexerSchedule;
 };
 
+export type RunOptions = { waitForCompletion: boolean };
+
 export class Indexer {
   private constructor(
     readonly config: IndexerConfig,
@@ -129,13 +132,37 @@ export class Indexer {
     }
   }
 
-  async run(): Promise<void> {
+  async run(): Promise<void>;
+  async run(options: { waitForCompletion: false }): Promise<void>;
+  async run(options: {
+    waitForCompletion: true;
+  }): Promise<IndexerExecutionResult>;
+  async run(options?: RunOptions): Promise<void | IndexerExecutionResult> {
     const res = await this.apiClient.POST(`/indexers/${this.config.name}/run`);
     // 200 is returned if the indexer was already running, 202 is returned if the indexer was started
     if (res.status !== 202 && res.status !== 200) {
       const message = res.status === 400 ? await res.text() : res.statusText;
       throw new Error(`Failed to run indexer: ${message}`);
     }
+
+    if (!options?.waitForCompletion) {
+      return;
+    }
+
+    let executionResult: IndexerExecutionResult | undefined;
+    while (!executionResult) {
+      const history: IndexerExecutionHistory = await this.getExecutionHistory();
+      if (
+        history &&
+        history.results.length > 0 &&
+        history.results[0].status !== "inProgress"
+      ) {
+        executionResult = history.results[0];
+      } else {
+        await setTimeout(500);
+      }
+    }
+    return executionResult;
   }
 
   async getExecutionHistory(): Promise<IndexerExecutionHistory> {
