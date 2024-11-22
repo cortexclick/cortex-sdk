@@ -206,7 +206,7 @@ test("test streaming content", { timeout: 180000 }, async () => {
   });
 
   let sawPlan = false;
-  let sawDraft = false;
+  let sawWriteSection = false;
   let sawEditorial = false;
 
   statusStream.on("data", (data) => {
@@ -216,8 +216,8 @@ test("test streaming content", { timeout: 180000 }, async () => {
       case "plan":
         sawPlan = true;
         break;
-      case "first-draft":
-        sawDraft = true;
+      case "write-section":
+        sawWriteSection = true;
         break;
       case "editorial":
         sawEditorial = true;
@@ -233,7 +233,7 @@ test("test streaming content", { timeout: 180000 }, async () => {
   expect(contentResult.version).toBe(0);
   expect(contentResult.commands.length).toBe(1);
   expect(sawPlan).toBe(true);
-  expect(sawDraft).toBe(true);
+  expect(sawWriteSection).toBe(true);
   expect(sawEditorial).toBe(true);
   expect(contentResult.status).toBe(ContentStatus.Draft);
   expect(contentResult.publishedVersion).toBe(undefined);
