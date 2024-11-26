@@ -140,6 +140,16 @@ export class Cortex {
     return new Cortex(config, apiClient, name);
   }
 
+  static async list(apiClient: CortexApiClient): Promise<Cortex[]> {
+    const res = await apiClient.GET(`/cortexes`);
+    if (res.status !== 200) {
+      throw new Error(`Failed to list cortexes: ${res.statusText}`);
+    }
+
+    const cortexes: (CortexConfig & { name: string })[] = await res.json();
+    return cortexes.map((cortex) => new Cortex(cortex, apiClient, cortex.name));
+  }
+
   static async configure(
     apiClient: CortexApiClient,
     name: string,
