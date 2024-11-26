@@ -7,7 +7,7 @@ import { Catalog } from "./catalog";
 let catalog: Catalog;
 
 beforeEach(async () => {
-  const catalogName = `catalog-sdk-test-${Date.now()}`;
+  const catalogName = `document-sdk-test-${Date.now()}`;
 
   const config: CatalogConfig = {
     description: "foo bar",

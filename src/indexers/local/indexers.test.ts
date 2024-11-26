@@ -11,7 +11,7 @@ beforeEach(async () => {
     instructions: ["a", "b"],
   };
 
-  const catalogName = `catalog-${Date.now()}`;
+  const catalogName = `catalog-local-indexers-test-${Date.now()}`;
   catalog = await testClient.configureCatalog(catalogName, config);
 }, 30000);
 

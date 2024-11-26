@@ -146,6 +146,10 @@ export class CortexClient {
     return Cortex.get(this.apiClient, name);
   }
 
+  async listCortexes(): Promise<Cortex[]> {
+    return Cortex.list(this.apiClient);
+  }
+
   async configureCortex(name: string, opts: CortexConfig): Promise<Cortex> {
     return Cortex.configure(this.apiClient, name, opts);
   }
