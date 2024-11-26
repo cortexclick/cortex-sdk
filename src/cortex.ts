@@ -146,7 +146,8 @@ export class Cortex {
       throw new Error(`Failed to list cortexes: ${res.statusText}`);
     }
 
-    const cortexes: (CortexConfig & { name: string })[] = await res.json();
+    const cortexes: (CortexConfig & { name: string })[] = (await res.json())
+      .cortexes;
     return cortexes.map((cortex) => new Cortex(cortex, apiClient, cortex.name));
   }
 
