@@ -76,14 +76,19 @@ export class Catalog {
     };
     const getRes = await apiClient.GET(`/catalogs/${name}`);
     let res: Response;
-    if (getRes.status !== 200) {
+    if (getRes.status === 200) {
+      res = await apiClient.PUT(`/catalogs/${name}`, config);
+    } else if (getRes.status === 404) {
       res = await apiClient.POST("/catalogs", createConfig);
     } else {
-      res = await apiClient.PUT(`/catalogs/${name}`, config);
+      const message =
+        getRes.status === 400 ? await getRes.text() : getRes.statusText;
+      throw new Error(`Failed to configure catalog: ${message}`);
     }
 
     if (res.status > 201) {
-      throw new Error(`Failed to configure catalog: ${res.statusText}`);
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to configure catalog: ${message}`);
     }
     return new Catalog(config, apiClient, name);
   }
@@ -197,7 +202,8 @@ export class Catalog {
     }
 
     if (res.status > 202) {
-      throw new Error(`Failed to upsert documents: ${res.statusText}`);
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to upsert documents: ${message}`);
     }
 
     const body = await res.json();

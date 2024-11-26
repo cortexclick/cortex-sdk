@@ -47,8 +47,8 @@ test(
   async () => {
     const cortexName = `cortex-sdk-test-${Date.now()}`;
 
-    const catalogName = `catalog-sdk-test-${Date.now()}`;
-    const catalogName2 = `catalog-sdk-test-${Date.now() + 1}`;
+    const catalogName = `cortex-sdk-test-${Date.now()}`;
+    const catalogName2 = `cortex-sdk-test-${Date.now() + 1}`;
 
     const config: CatalogConfig = {
       description: "foo bar",
