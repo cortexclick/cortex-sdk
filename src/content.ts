@@ -196,6 +196,12 @@ export class Content {
       title,
       prompt,
     });
+
+    if (res.status !== 200) {
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to create content: ${message}`);
+    }
+
     const body = await res.json();
 
     return new Content(
@@ -224,6 +230,12 @@ export class Content {
       stream,
       noContentInHeaders: true,
     });
+
+    if (res.status !== 200) {
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to create content: ${message}`);
+    }
+
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
 
@@ -299,6 +311,12 @@ export class Content {
     }
 
     const res = await this.apiClient.PUT(`/content/${this._id}`, opts);
+
+    if (res.status !== 200) {
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to edit content: ${message}`);
+    }
+
     const body = await res.json();
     this.updateFromResponseBody(body);
 
@@ -325,6 +343,12 @@ export class Content {
     const res = await this.apiClient.POST(`/content/${this._id}/refine`, {
       prompt: opts.prompt,
     });
+
+    if (res.status !== 200) {
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to refine content: ${message}`);
+    }
+
     const body = await res.json();
     this.updateFromResponseBody(body);
 
@@ -340,6 +364,12 @@ export class Content {
       stream: true,
       noContentInHeaders: true,
     });
+
+    if (res.status !== 200) {
+      const message = res.status === 400 ? await res.text() : res.statusText;
+      throw new Error(`Failed to refine content: ${message}`);
+    }
+
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
 
